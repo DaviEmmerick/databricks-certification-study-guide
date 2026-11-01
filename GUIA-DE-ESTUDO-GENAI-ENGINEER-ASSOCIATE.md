@@ -22,7 +22,7 @@ Este guia reúne as informações da prova, uma ordem de estudo e os materiais m
 
 - [Página oficial da certificação](https://www.databricks.com/learn/certification/genai-engineer-associate)
 - [Guia oficial da prova — PDF, edição de agosto de 2026](https://www.databricks.com/sites/default/files/2026-10/databricks-certified-gen-ai-associate-exam-guide-august-2026.pdf)
-- [Informações da prova e recursos neste repositório](./certifications/genai-engineer-associate/README.md)
+- [Informações da prova e recursos neste repositório](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/README.md)
 
 ## 2. Domínios e prioridades
 
@@ -30,12 +30,12 @@ As quantidades de questões abaixo são **estimativas proporcionais** dos 45 ite
 
 | Domínio do guia oficial | Peso | Estimativa de questões | Material principal |
 | :--- | :---: | :---: | :--- |
-| Application Development | 30 % | ~13–14 | [Aplicação](./certifications/genai-engineer-associate/01-application-development/README.md) |
-| Assembling and Deploying Applications | 22 % | ~10 | [Montagem e implantação](./certifications/genai-engineer-associate/02-assembling-and-deploying-apps/README.md) |
-| Design Applications | 14 % | ~6 | [Design de aplicações](./certifications/genai-engineer-associate/03-design-applications/README.md) |
-| Data Preparation | 14 % | ~6 | [Preparação de dados](./certifications/genai-engineer-associate/04-data-preparation/README.md) |
-| Evaluation and Monitoring | 12 % | ~5–6 | [Avaliação e monitoramento](./certifications/genai-engineer-associate/05-evaluation-and-monitoring/README.md) |
-| Governance | 8 % | ~3–4 | [Governança](./certifications/genai-engineer-associate/06-governance/README.md) |
+| Application Development | 30 % | ~13–14 | [Aplicação](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/01-application-development/README.md) |
+| Assembling and Deploying Applications | 22 % | ~10 | [Montagem e implantação](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/02-assembling-and-deploying-apps/README.md) |
+| Design Applications | 14 % | ~6 | [Design de aplicações](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/03-design-applications/README.md) |
+| Data Preparation | 14 % | ~6 | [Preparação de dados](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/04-data-preparation/README.md) |
+| Evaluation and Monitoring | 12 % | ~5–6 | [Avaliação e monitoramento](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/05-evaluation-and-monitoring/README.md) |
+| Governance | 8 % | ~3–4 | [Governança](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/06-governance/README.md) |
 
 Cada índice de domínio contém uma tabela **Exam Guide Coverage**, que relaciona as habilidades listadas no guia oficial aos capítulos que as explicam. Consulte essas tabelas para conferir a cobertura completa, não apenas os resumos deste roteiro.
 
@@ -45,32 +45,32 @@ O cronograma abaixo distribui aproximadamente **32–40 horas** em quatro semana
 
 ### Semana 1 — Desenvolvimento de aplicações (10–12 horas)
 
-- [Prompt engineering](./certifications/genai-engineer-associate/01-application-development/01-prompt-engineering.md): estrutura de prompts, exemplos, formato de saída e injeção de prompt.
-- [Chains e agents](./certifications/genai-engineer-associate/01-application-development/02-chains-agents.md): fluxo fixo versus ciclo de decisão do agente, ferramentas e chamadas de função.
-- [Estratégias de RAG](./certifications/genai-engineer-associate/01-application-development/03-retrieval-augmentation-strategies.md) e [Vector Search em runtime](./certifications/genai-engineer-associate/01-application-development/04-vector-search-runtime.md).
-- [Sistemas agentic com MLflow e Genie](./certifications/genai-engineer-associate/01-application-development/05-agentic-systems-mlflow-and-genie.md) e [seleção de modelos e qualidade](./certifications/genai-engineer-associate/01-application-development/06-model-selection-and-response-quality.md).
+- [Prompt engineering](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/01-application-development/01-prompt-engineering.md): estrutura de prompts, exemplos, formato de saída e injeção de prompt.
+- [Chains e agents](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/01-application-development/02-chains-agents.md): fluxo fixo versus ciclo de decisão do agente, ferramentas e chamadas de função.
+- [Estratégias de RAG](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/01-application-development/03-retrieval-augmentation-strategies.md) e [Vector Search em runtime](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/01-application-development/04-vector-search-runtime.md).
+- [Sistemas agentic com MLflow e Genie](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/01-application-development/05-agentic-systems-mlflow-and-genie.md) e [seleção de modelos e qualidade](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/01-application-development/06-model-selection-and-response-quality.md).
 
 ### Semana 2 — Montagem e implantação (8–10 horas)
 
-- [Foundation Model APIs](./certifications/genai-engineer-associate/02-assembling-and-deploying-apps/01-mosaic-ai-and-foundation-models.md): compare cobrança pay-per-token e provisioned throughput.
-- [MLflow para GenAI](./certifications/genai-engineer-associate/02-assembling-and-deploying-apps/02-mlflow-for-genai.md) e [compound AI apps](./certifications/genai-engineer-associate/02-assembling-and-deploying-apps/03-compound-ai-apps.md).
-- [Servidores MCP](./certifications/genai-engineer-associate/02-assembling-and-deploying-apps/04-mcp-servers.md): saiba distinguir opções gerenciadas, externas e customizadas.
-- [Controle de acesso e inferência em lote](./certifications/genai-engineer-associate/02-assembling-and-deploying-apps/05-access-control-and-batch-inference.md).
-- [Memória, CI/CD, prompts e interfaces](./certifications/genai-engineer-associate/02-assembling-and-deploying-apps/06-memory-cicd-prompts-and-interfaces.md).
+- [Foundation Model APIs](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/02-assembling-and-deploying-apps/01-mosaic-ai-and-foundation-models.md): compare cobrança pay-per-token e provisioned throughput.
+- [MLflow para GenAI](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/02-assembling-and-deploying-apps/02-mlflow-for-genai.md) e [compound AI apps](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/02-assembling-and-deploying-apps/03-compound-ai-apps.md).
+- [Servidores MCP](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/02-assembling-and-deploying-apps/04-mcp-servers.md): saiba distinguir opções gerenciadas, externas e customizadas.
+- [Controle de acesso e inferência em lote](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/02-assembling-and-deploying-apps/05-access-control-and-batch-inference.md).
+- [Memória, CI/CD, prompts e interfaces](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/02-assembling-and-deploying-apps/06-memory-cicd-prompts-and-interfaces.md).
 
 ### Semana 3 — Design e preparação de dados (8–10 horas)
 
-- [Design de RAG](./certifications/genai-engineer-associate/03-design-applications/01-rag-design-patterns.md): RAG versus fine-tuning, recuperação e re-ranking.
-- [Design de solução e planejamento de ferramentas](./certifications/genai-engineer-associate/03-design-applications/02-solution-design-and-tool-planning.md): traduza o objetivo de negócio em entradas, saídas e componentes.
-- [Agent Bricks](./certifications/genai-engineer-associate/03-design-applications/03-agent-bricks.md): saiba escolher a solução adequada para cada cenário do exame.
-- [Processamento e chunking](./certifications/genai-engineer-associate/04-data-preparation/01-document-processing-chunking.md), [embeddings](./certifications/genai-engineer-associate/04-data-preparation/02-embeddings-models.md), [índices](./certifications/genai-engineer-associate/04-data-preparation/03-databricks-vector-search.md) e [extração e avaliação da recuperação](./certifications/genai-engineer-associate/04-data-preparation/04-source-documents-extraction-and-retrieval-eval.md).
+- [Design de RAG](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/03-design-applications/01-rag-design-patterns.md): RAG versus fine-tuning, recuperação e re-ranking.
+- [Design de solução e planejamento de ferramentas](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/03-design-applications/02-solution-design-and-tool-planning.md): traduza o objetivo de negócio em entradas, saídas e componentes.
+- [Agent Bricks](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/03-design-applications/03-agent-bricks.md): saiba escolher a solução adequada para cada cenário do exame.
+- [Processamento e chunking](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/04-data-preparation/01-document-processing-chunking.md), [embeddings](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/04-data-preparation/02-embeddings-models.md), [índices](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/04-data-preparation/03-databricks-vector-search.md) e [extração e avaliação da recuperação](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/04-data-preparation/04-source-documents-extraction-and-retrieval-eval.md).
 
 ### Semana 4 — Avaliação, monitoramento, governança e revisão (6–8 horas)
 
-- [Avaliação de aplicações LLM](./certifications/genai-engineer-associate/05-evaluation-and-monitoring/01-evaluation-llm-apps.md), [monitoramento online](./certifications/genai-engineer-associate/05-evaluation-and-monitoring/02-online-monitoring.md) e [judges, scorers e feedback](./certifications/genai-engineer-associate/05-evaluation-and-monitoring/03-mlflow-scorers-judges-and-feedback.md).
-- [AI Gateway, uso e custos](./certifications/genai-engineer-associate/05-evaluation-and-monitoring/04-ai-gateway-usage-and-cost-control.md). No guia da prova, esse conteúdo está em **Evaluation and Monitoring**, não em Governance.
-- [Governança](./certifications/genai-engineer-associate/06-governance/01-governance-overview.md): mascaramento, proteção contra entradas maliciosas, licenças e tratamento de conteúdo problemático.
-- Faça as [questões de prática](./certifications/genai-engineer-associate/resources/practice-questions/README.md), depois os simulados da seção [Prática e simulados](#6-prática-e-simulados), e revise os assuntos errados.
+- [Avaliação de aplicações LLM](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/05-evaluation-and-monitoring/01-evaluation-llm-apps.md), [monitoramento online](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/05-evaluation-and-monitoring/02-online-monitoring.md) e [judges, scorers e feedback](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/05-evaluation-and-monitoring/03-mlflow-scorers-judges-and-feedback.md).
+- [AI Gateway, uso e custos](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/05-evaluation-and-monitoring/04-ai-gateway-usage-and-cost-control.md). No guia da prova, esse conteúdo está em **Evaluation and Monitoring**, não em Governance.
+- [Governança](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/06-governance/01-governance-overview.md): mascaramento, proteção contra entradas maliciosas, licenças e tratamento de conteúdo problemático.
+- Faça as [questões de prática](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/resources/practice-questions/README.md), depois os simulados da seção [Prática e simulados](#6-prática-e-simulados), e revise os assuntos errados.
 
 ## 4. Conceitos que você precisa saber explicar
 
@@ -112,11 +112,11 @@ Você não precisa concluir as outras certificações para fazer esta prova. Use
 
 ## 6. Prática e simulados
 
-1. Faça as [questões por tópico](./certifications/genai-engineer-associate/resources/practice-questions/README.md). Os conjuntos 05–07 enfatizam habilidades do guia de 2026; as questões deste repositório são de resposta única, enquanto a prova real também inclui múltipla seleção.
+1. Faça as [questões por tópico](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/resources/practice-questions/README.md). Os conjuntos 05–07 enfatizam habilidades do guia de 2026; as questões deste repositório são de resposta única, enquanto a prova real também inclui múltipla seleção.
 2. Pratique o fluxo completo de RAG no [Lab 05 — Vector Search/AI Search e RAG](./labs/05-mosaic-ai-rag-demo.md). Para revisar permissões e ativos no Unity Catalog, consulte também o [Lab 02 — Unity Catalog](./labs/02-unity-catalog-setup.md).
-3. Faça o [Simulado 1](./certifications/genai-engineer-associate/resources/mock-exam/README.md) e o [Simulado 2](./certifications/genai-engineer-associate/resources/mock-exam-2/README.md), cada um com 45 questões e limite de 90 minutos. Os simulados são de resposta única; pratique múltipla seleção separadamente.
-4. Após cada sessão, use os respectivos [debriefs do Simulado 1](./certifications/genai-engineer-associate/resources/mock-exam/debrief.md) e do [Simulado 2](./certifications/genai-engineer-associate/resources/mock-exam-2/debrief.md) para voltar aos capítulos das questões erradas.
-5. Na reta final, leia as [dicas de prova](./certifications/genai-engineer-associate/resources/exam-tips.md) e a [revisão final de 20 minutos](./certifications/genai-engineer-associate/resources/final-review.md).
+3. Faça o [Simulado 1](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/resources/mock-exam/README.md) e o [Simulado 2](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/resources/mock-exam-2/README.md), cada um com 45 questões e limite de 90 minutos. Os simulados são de resposta única; pratique múltipla seleção separadamente.
+4. Após cada sessão, use os respectivos [debriefs do Simulado 1](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/resources/mock-exam/debrief.md) e do [Simulado 2](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/resources/mock-exam-2/debrief.md) para voltar aos capítulos das questões erradas.
+5. Na reta final, leia as [dicas de prova](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/resources/exam-tips.md) e a [revisão final de 20 minutos](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/resources/final-review.md).
 
 Para a prova, as dicas do repositório sugerem **60 minutos** para a primeira passagem, **20 minutos** para revisar questões sinalizadas e **10 minutos** para uma conferência final. Em questões de múltipla seleção, selecione exatamente a quantidade pedida e avalie cada alternativa individualmente.
 
@@ -129,7 +129,7 @@ O [Lab 05](./labs/05-mosaic-ai-rag-demo.md) percorre preparação de documentos,
 
 ## 8. Links oficiais e de referência
 
-- [Todos os links oficiais e documentação curada para a certificação](./certifications/genai-engineer-associate/resources/official-links.md)
+- [Todos os links oficiais e documentação curada para a certificação](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/resources/official-links.md)
 - [Desenvolvimento de agents no Databricks](https://docs.databricks.com/aws/en/agents/)
 - [Databricks AI Search (antigo Vector Search)](https://docs.databricks.com/aws/en/ai-search/ai-search)
 - [Avaliação e monitoramento GenAI com MLflow](https://docs.databricks.com/aws/en/mlflow3/genai/eval-monitor/)
@@ -138,4 +138,4 @@ O [Lab 05](./labs/05-mosaic-ai-rag-demo.md) percorre preparação de documentos,
 
 ---
 
-**[← Voltar ao README do repositório](./README.md) | [Abrir o guia completo da certificação](./certifications/genai-engineer-associate/README.md)**
+**[← Voltar ao README do repositório](./README.md) | [Abrir o guia completo da certificação](./genai-engineer-associate-ptbr/pt-br/certifications/genai-engineer-associate/README.md)**
