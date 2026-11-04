@@ -67,6 +67,26 @@ HEADING_DIFFICULTY_RE = re.compile(r"\*\(\s*(Easy|Medium|Hard)\s*\)\*", re.IGNOR
 BODY_DIFFICULTY_RE = re.compile(r"\*\*Question\*\* \*\((Easy|Medium|Hard)\)\*:\s*(.+)", re.DOTALL)
 BODY_QUESTION_PREFIX_RE = re.compile(r"\*\*Question\*\*:\s*(.+)", re.DOTALL)
 CHOICE_RE = re.compile(r"^([A-D])\)\s*(.+?)\s*$")
+MD_HEADING_RE = re.compile(r"^#{1,6} ")
+CODE_FENCE_RE = re.compile(r"^\s*(```|~~~)")
+
+
+def cut_at_next_heading(body: str) -> str:
+    """Return `body` up to its first Markdown heading outside a fenced code block.
+
+    A `# comment` at column 0 inside a ```python block is code, not a heading,
+    so it must not end the question.
+    """
+    lines = body.split("\n")
+    in_fence = False
+    for idx, line in enumerate(lines):
+        if CODE_FENCE_RE.match(line):
+            in_fence = not in_fence
+        elif not in_fence and MD_HEADING_RE.match(line):
+            return "\n".join(lines[:idx])
+    return body
+
+
 ANSWER_CALLOUT_RE = re.compile(r"^>\s*\[!success\]-?\s*(?:Answer)?\s*$", re.IGNORECASE)
 # Correct-answer markers seen in the wild:
 #   **Correct Answer: B**
@@ -111,7 +131,7 @@ def parse_questions(md_path: Path, domain_id: str) -> list[dict]:
         # `### Question GOV-1` items under "Supplementary questions (not in the
         # timed set)" — is absorbed into it, and its A–D lines overwrite the
         # real choices while the original correct-answer letter is kept.
-        body = re.split(r"^#{1,6} ", body, maxsplit=1, flags=re.MULTILINE)[0]
+        body = cut_at_next_heading(body)
 
         qnum, title, heading_difficulty = parse_heading(heading)
         if qnum is None:
