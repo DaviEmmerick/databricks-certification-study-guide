@@ -4,6 +4,27 @@ Notable changes to the Databricks Certification Study Guide.
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/). Dates use ISO 8601. Each section is grouped under the date the change shipped, with the Databricks exam-guide version each affected certification tracks.
 
+## [2026.11.04] — GenAI Engineer Associate: every exam-guide bullet now has a question
+
+A series of four PRs measured how the GenAI question banks cover the 56 bullets of the exam guide published **March 18, 2026** ([PDF](https://www.databricks.com/sites/default/files/2026-10/databricks-certified-gen-ai-associate-exam-guide-august-2026.pdf)), then closed the gaps. English and pt-br change together.
+
+### Quiz converter — `practice/build.py`
+
+- **Fixed:** a mock exam's last numbered question absorbed the supplementary `### Question …` items that follow it, so their A–D lines replaced its choices while its correct-answer letter was kept. Affected: GenAI Mock 1 and 2 Q45, DE Professional Mock 1 Q63 and Mock 2 Q60. Each question now ends at the next heading outside a fenced code block, and the supplementary items stay out of the timed sets.
+
+### New questions
+
+- **Practice:** 10 questions for the five bullets that had none: S3.3 chunking from evaluation results (`03` Q15–16), S4.1 pyfunc chains with pre- and post-processing (`06` Q14–15), S6.1 LLM size and architecture from metrics (`07` Q13–14), S6.4 inference logging for a deployed RAG app (`07` Q15–16), S5.4 problematic text in source data (`07` Q17–18). GenAI practice bank: 85 → 95.
+- **Mock Exam 2:** its supplementary block was a copy of Mock 1's. It now holds five new questions (DATA-1, APPDEV-1, APPDEV-2, BATCH-1, PROMPT-1) on bullets that had a single question. Mock 1's debrief no longer labels AGENT-1, GW-1 and EVAL-1 as Governance.
+
+### Coverage matrix
+
+- **Added** `resources/exam-guide-coverage-matrix.md` (EN + pt-br): every bullet, the questions that test it, and how to turn a diagnostic's wrong answers into a study list. After this series no bullet has zero questions; eight still have one.
+
+### Counts
+
+- `practice/README.md` and the top-level `README.md` now match the generated banks: 758 practice + 579 mock = **1,337** questions (previously listed as 931; ML Associate mocks are 48 / 48 and GenAI Mock 2 is 45).
+
 ## [2026.10.26] — Oct 2026 refresh: every cert re-checked against current exam guides and platform docs
 
 A series of seven PRs (#32–#37 plus this one) re-checked all six certifications against the exam guides published on databricks.com and the Databricks docs as of **October 26, 2026**. This entry records the top-level sync and the shared content.

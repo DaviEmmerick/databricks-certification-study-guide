@@ -93,6 +93,7 @@ Each folder's `README.md` has an **Exam Guide Coverage** table that maps every b
 | [Exam Tips](./resources/exam-tips.md)                           | Exam strategies and tips                 |
 | [Final Review](./resources/final-review.md)                     | Exam-morning cram scan                   |
 | [Official Links](./resources/official-links.md)                 | Documentation and resources              |
+| [Exam-Guide Coverage Matrix](./resources/exam-guide-coverage-matrix.md) | Which questions test each of the 56 exam-guide bullets |
 
 ## Interview Preparation
 

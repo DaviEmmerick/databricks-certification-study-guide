@@ -35,9 +35,9 @@ A browser-based quiz for the practice-question markdown files in this repo. Trac
 
 ## Available banks
 
-**18 banks · 931 questions total** — every cert has practice questions plus two full-length mock exams.
+**18 banks · 1,337 questions total** — every cert has practice questions plus two full-length mock exams.
 
-### Practice questions (6 banks · 364 questions)
+### Practice questions (6 banks · 758 questions)
 
 Topic-organised question sets sourced from each cert's `practice-questions/` folder. Best for drilling a specific domain.
 
@@ -48,9 +48,9 @@ Topic-organised question sets sourced from each cert's `practice-questions/` fol
 | Data Analyst Associate | `certifications/data-analyst-associate/resources/practice-questions/` | 159 |
 | ML Associate | `certifications/ml-associate/resources/practice-questions/` | 107 |
 | ML Professional | `certifications/ml-professional/resources/practice-questions/` | 97 |
-| GenAI Engineer Associate | `certifications/genai-engineer-associate/resources/practice-questions/` | 85 |
+| GenAI Engineer Associate | `certifications/genai-engineer-associate/resources/practice-questions/` | 95 |
 
-### Mock exams (12 banks · 567 questions)
+### Mock exams (12 banks · 579 questions)
 
 Full-length exam-feel sets sourced from each cert's `mock-exam/` and `mock-exam-2/` folders. Each is a single `questions.md` covering every domain. Best for end-to-end timing practice.
 
@@ -59,9 +59,9 @@ Full-length exam-feel sets sourced from each cert's `mock-exam/` and `mock-exam-
 | Data Engineer Associate | 45 | 45 |
 | Data Engineer Professional | 63 | 60 |
 | Data Analyst Associate | 45 | 45 |
-| ML Associate | 43 | 44 |
+| ML Associate | 48 | 48 |
 | ML Professional | 45 | 45 |
-| GenAI Engineer Associate | 45 | 42 |
+| GenAI Engineer Associate | 45 | 45 |
 
 ## How to run
 
@@ -226,7 +226,7 @@ PRs welcome for: more cert banks, UI improvements, additional adaptive strategie
 
 - This isn't an official Databricks practice exam. It's static study material derived from the markdown files in this repo. Quality matches the quality of those files.
 - The adaptive selector is a simple weighted-random heuristic, not a full spaced-repetition algorithm like SM-2 or FSRS. It's good enough for cert prep; if you want SM-2-level scheduling, use Anki (see [`anki/README.md`](../anki/README.md)).
-- 364 topic-drill practice questions + 567 questions across 12 full-length mock-exam banks = **931 total**. The mocks remain the canonical end-to-end exam simulation; the practice banks are for between-mock drilling. The summary screen handles both kinds (PASS/BELOW verdict for mocks, descriptive labels for practice).
+- 758 topic-drill practice questions + 579 questions across 12 full-length mock-exam banks = **1,337 total**. The mocks remain the canonical end-to-end exam simulation; the practice banks are for between-mock drilling. The summary screen handles both kinds (PASS/BELOW verdict for mocks, descriptive labels for practice).
 - A handful of mock-exam questions whose choices contain multi-line code fences are skipped during build (the parser sees a bare `A)` / `C)` line). Same edge case as the practice banks — fix by inlining the code on the choice line or moving it into the answer explanation.
 
 ---
