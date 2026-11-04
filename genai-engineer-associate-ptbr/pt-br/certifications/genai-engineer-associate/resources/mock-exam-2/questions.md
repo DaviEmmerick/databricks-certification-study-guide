@@ -755,97 +755,97 @@ D) Um desenvolvedor que precisa da menor latência possível para um único endp
 
 ---
 
-## Novas questões para a atualização do blueprint de março de 2026
+## Questões suplementares (fora do conjunto cronometrado)
 
-As questões abaixo abordam o domínio **Governance**, cuja importância foi elevada (8 %).
+Estas cinco questões não fazem parte das 45 cronometradas. Cada uma cobre um item do guia do exame que tem apenas uma outra questão nos bancos de questões deste guia.
 
-### Questão GOV-1 *(Média — Governance)*
+### Questão DATA-1 *(Difícil — Data Preparation)*
 
-**Cenário**: Uma equipe está se preparando para implantar uma aplicação RAG que recupera dados de um índice vetorial criado sobre uma tabela Delta com chamados de suporte ao cliente. Os chamados incluem endereços de e-mail e números de conta. A equipe de compliance exige que PII nunca apareça nos chunks recuperados exibidos aos usuários.
+**Cenário**: Um job noturno reprocessa cada documento de política alterado durante o dia, divide-o novamente em chunks, atribui a cada chunk `chunk_id = uuid4()` e acrescenta os chunks a `main.kb.policy_chunks`. Essa tabela Delta do Unity Catalog tem Change Data Feed habilitado e alimenta um índice Delta Sync acionado (chave primária `chunk_id`) em um endpoint padrão. Depois de um mês, a recuperação retorna tanto a redação antiga quanto a atual das mesmas seções de políticas. Apenas alguns dos 40.000 documentos mudam a cada noite, e a equipe quer que cada sincronização processe somente o que mudou.
 
-**Questão**: Em que etapa do pipeline deve ocorrer a redação de PII?
+**Questão**: Qual mudança na etapa de gravação corrige os resultados desatualizados e atende a essa restrição?
 
-A) No momento da recuperação — aplicar uma máscara de coluna UC à coluna de embeddings para ocultar o vetor quando PII for detectada  
-B) Após a geração — pós-processar a saída do LLM com uma regex para remover PII antes de responder ao usuário  
-C) No momento da divisão em chunks/geração de embeddings — redigir PII *antes* de gerar embeddings, para que o índice vetorial nunca contenha PII reconstruível  
-D) Na camada Unity AI Gateway — habilitar a política "PII detection" no endpoint de serving  
+A) Manter os IDs `uuid4()` e o append, mas mudar o índice de TRIGGERED para CONTINUOUS para que cada novo chunk chegue ao índice em segundos  
+B) Dividir novamente os 40.000 documentos em chunks todas as noites e gravá-los com `mode("overwrite")`, para que a tabela contenha apenas chunks atuais antes da sincronização  
+C) Tornar o `chunk_id` determinístico (a partir de `document_id` + posição do chunk) e fazer `MERGE` dos chunks de cada documento alterado nessa chave, excluindo os chunks remanescentes desse documento, e então acionar a sincronização  
+D) Manter a tabela como está e enviar os novos chunks de cada documento alterado diretamente ao índice com a API `upsert` do Vector Search  
 
 > [!success]- Resposta
 > **Resposta correta: C**
 >
-> PII precisa ser redigida **antes da geração dos embeddings**. Depois que uma string com PII vira embedding, o vetor fica no índice — e embeddings preservam informações suficientes para que o conteúdo original possa, às vezes, ser reconstruído. Máscaras de coluna UC (A) funcionam para acesso SQL, mas não para a representação vetorial. Regex após a geração (B) é frágil e causa perda de conteúdo. Guardrails de PII do Unity AI Gateway (D) são uma camada útil de defesa em profundidade, mas não resolvem a PII *dentro do próprio índice*; o padrão seguro é redigir no momento da divisão em chunks E aplicar filtros de gateway/saída.
+> As linhas desatualizadas estão na tabela de origem. Com UUIDs aleatórios, um chunk revisado nunca corresponde à sua linha anterior, então cada execução apenas acrescenta linhas, e o índice Delta Sync espelha fielmente as duas versões. Um `chunk_id` estável com `MERGE` transforma cada revisão em atualizações, inserções e exclusões registradas pelo Change Data Feed, de modo que a próxima sincronização em um endpoint padrão processa somente essas linhas. O modo CONTINUOUS (A) muda quando a sincronização é executada, não o conteúdo da tabela, então as duplicatas permanecem. O overwrite (B) elimina as duplicatas, mas substitui todas as linhas, e a sincronização gera novamente os embeddings de todo o corpus em vez de apenas alguns documentos. A API `upsert` (D) grava em índices Direct Vector Access; um índice Delta Sync obtém suas linhas da tabela de origem, onde os chunks desatualizados continuariam existindo.
 
 ---
 
-### Questão GOV-2 *(Média — Governance)*
+### Questão APPDEV-1 *(Média — Application Development)*
 
-**Cenário**: Uma equipe tem um endpoint Model Serving que hospeda uma aplicação GenAI voltada a clientes. As equipes de segurança e compliance precisam de uma trilha de auditoria: cada prompt e resposta, com timestamps e IDs de solicitação, retidos por pelo menos 90 dias e consultáveis por SQL.
+**Cenário**: Uma equipe precisa escolher um LLM para transformar transcrições longas de chamadas de suporte em um resumo de três frases. Cada transcrição do conjunto de dados de avaliação versionado tem um resumo de referência escrito por uma pessoa, e os três candidatos custam aproximadamente o mesmo por solicitação. O experimento MLflow tem uma execução por candidato. Modelo A, avaliado no conjunto de dados v3 (500 transcrições): ROUGE-L 0,41, BLEU 0,24, exact match 0,02. Modelo B, avaliado no conjunto de dados v3: ROUGE-L 0,47, BLEU 0,19, exact match 0,01. Modelo C, avaliado no conjunto de dados v2 (200 transcrições mais curtas e simples): ROUGE-L 0,55, BLEU 0,27, exact match 0,04.
 
-**Questão**: Qual recurso da Databricks atende ao requisito com menos código personalizado?
+**Questão**: Com base nessas execuções, qual modelo a equipe deve selecionar?
 
-A) Adicionar um logging callback dentro da chain LLM que grave cada solicitação/resposta em uma tabela Delta  
-B) Habilitar **Inference Tables** no endpoint Model Serving — a Databricks captura automaticamente `request`, `response`, `timestamp_ms` e `databricks_request_id` em uma tabela Delta no UC  
-C) Enviar stderr do endpoint para um destino CloudWatch / Cloud Logging e analisar os logs todas as noites  
-D) Configurar uma política "audit" do Unity AI Gateway para enviar um resumo diário por e-mail à equipe de compliance  
+A) O modelo C, porque tem as maiores pontuações de ROUGE-L e BLEU das três execuções  
+B) O modelo B, porque tem o maior ROUGE-L entre as execuções avaliadas no mesmo conjunto de dados, e ROUGE é a métrica adequada para resumos  
+C) O modelo A, porque tem o maior BLEU entre as execuções no conjunto v3, e BLEU é a métrica padrão para a qualidade de resumos  
+D) O modelo A, porque exact match é a mais objetiva das três métricas e o modelo A supera o modelo B nela  
 
 > [!success]- Resposta
 > **Resposta correta: B**
 >
-> Inference Tables são o registro de auditoria oficial documentado para endpoints Model Serving. Ao habilitá-las, cada solicitação/resposta é capturada automaticamente em uma tabela Delta no UC. O schema exato depende do tipo de endpoint: **tabelas de inferência do Model Serving** usam `request`, `response`, `timestamp_ms`, `databricks_request_id`; **tabelas de inferência do AI Gateway** (schema unificado para endpoints encapsulados pelo Gateway) usam `request_time` e um layout um pouco diferente — ambas oferecem a mesma garantia de auditoria e retenção consultável por SQL pronta para uso. A opção A é a versão "faça você mesmo" e é desnecessária. A opção C é frágil e externa ao sistema. A opção D não corresponde ao funcionamento do Unity AI Gateway. A política de logging do Gateway encaminha automaticamente os dados às Inference Tables (que é exatamente a resposta correta, apresentada de outra forma); não existe um recurso integrado de resumo por e-mail.
+> Duas verificações decidem a questão. Primeiro, só são comparáveis as execuções no mesmo conjunto de dados de avaliação: as pontuações do modelo C vêm de um subconjunto mais fácil de 200 linhas e não dizem nada sobre o desempenho dele no v3; execute-o novamente no v3 antes de considerá-lo. Segundo, use a métrica adequada à tarefa: ROUGE mede a sobreposição com um resumo de referência e é a métrica clássica de sumarização, BLEU foi criado para tradução, e exact match serve para respostas factuais curtas, porque um resumo gerado quase nunca coincide palavra por palavra com a referência. No v3, o modelo B lidera em ROUGE-L, então é a escolha certa.
 
 ---
 
-### Questão AGENT-1 *(Média — Assembling and Deploying Apps)*
+### Questão APPDEV-2 *(Difícil — Application Development)*
 
-**Cenário**: Uma equipe criou uma chain RAG no LangChain. Precisa implantá-la como um único endpoint Model Serving com respostas em streaming, MLflow tracing e captura automática em Inference Tables.
+**Cenário**: Um agente de suporte passou na avaliação pré-lançamento: `mlflow.genai.evaluate()` em um conjunto de dados de avaliação selecionado com 400 linhas obteve 0,92 em `RelevanceToQuery` e `RetrievalGroundedness`, o que atendeu ao gate de lançamento. Três semanas após o lançamento, o monitoramento de produção (os mesmos dois scorers, registrados no experimento com `sample_rate=0.2`) mostra as duas taxas de aprovação em cerca de 0,75. As falhas se concentram em traces sobre uma linha de produtos lançada depois que o conjunto de dados foi criado. Executar novamente a avaliação offline ainda resulta em 0,92.
 
-**Questão**: Qual fluxo de implantação atende melhor ao padrão documentado?
+**Questão**: O que a diferença entre as duas fases indica e qual é o próximo passo correto?
 
-A) Criar uma subclasse de `mlflow.pyfunc.ResponsesAgent`, encapsular a chain em `predict()`, registrar com `mlflow.pyfunc.log_model`, registrar no UC e, então, chamar `databricks.agents.deploy(uc_model_name, version)`  
-B) Serializar a chain com pickle e escrever uma aplicação Flask personalizada para executar em Docker no workspace  
-C) Registrar a chain com `mlflow.langchain.log_model` e criar manualmente um endpoint Model Serving pela interface do workspace  
-D) Usar uma tarefa de notebook Databricks agendada para executar a chain  
+A) O conjunto de dados de avaliação não reflete mais o tráfego de produção; adicionar a ele os traces sinalizados (com expectativas rotuladas por SMEs), corrigir o agente e avaliar novamente antes do lançamento  
+B) As pontuações do monitoramento não são confiáveis porque os traces de produção não têm ground truth; considerar o 0,92 offline como a qualidade real e manter o agente como está  
+C) O monitoramento precisa de um sinal mais forte; substituir os dois scorers por `Correctness` nos traces de produção para que a produção siga o mesmo padrão do gate de lançamento  
+D) A amostra de 20 % está distorcendo o resultado; aumentar `sample_rate` para 1.0 para que as pontuações do monitoramento convirjam para o 0,92 offline  
 
 > [!success]- Resposta
 > **Resposta correta: A**
 >
-> `ResponsesAgent` do Mosaic AI Agent Framework + `databricks.agents.deploy()` é o fluxo documentado em uma etapa que oferece streaming, MLflow tracing e ativação automática de Inference Tables — este terceiro pilar habilita diretamente o monitoramento on-line EVAL-1. `databricks.agents.deploy()` provisiona o endpoint Model Serving, registra a versão e conecta os três recursos em uma chamada. A opção B é o caminho "faça você mesmo" e perde os benefícios do framework. A opção C funciona, mas requer duas etapas (não oferece streaming ou tracing automático sem encapsulamento). A opção D serve para processamento em lote, não para serving.
+> A avaliação pontua um conjunto de dados fixo e selecionado antes do lançamento; o monitoramento pontua uma amostra de traces de produção depois do lançamento. A pontuação offline continua em 0,92 porque o conjunto de dados nunca incluiu perguntas sobre a nova linha de produtos; a queda é real, e só o monitoramento consegue enxergá-la. As duas fases formam um loop: traces com problemas viram novas linhas de avaliação, e os mesmos scorers rodam nas duas fases para que os números continuem comparáveis. A opção B está errada porque `RelevanceToQuery` e `RetrievalGroundedness` não precisam de ground truth, então suas pontuações em produção são válidas. A opção C falha porque `Correctness` precisa de expectativas que os traces de produção não têm, e a opção D só muda a cobertura e o custo: pontuar mais tráfego não faria as novas perguntas serem aprovadas.
 
 ---
 
-### Questão GW-1 *(Média — Assembling and Deploying Apps)*
+### Questão BATCH-1 *(Média — Assembling and Deploying Applications)*
 
-**Cenário**: Uma equipe quer implantar a versão v3 de uma aplicação RAG, mantendo a v2 ativa como fallback. Precisa encaminhar 10 % do tráfego à v3 e 90 % à v2, com possibilidade de aumentar gradualmente o tráfego da v3 para 100 % com base em métricas de qualidade das Inference Tables.
+**Cenário**: Um Lakeflow Job noturno executa uma única instrução SQL que aplica `ai_query()` com um prompt de triagem personalizado a cerca de 3 milhões de novos sinistros de seguro e grava os resultados em uma tabela Delta. Na noite passada, a consulta falhou após várias horas: o texto de um sinistro excedeu a janela de contexto do modelo, o endpoint retornou um erro para essa linha e nenhum resultado foi gravado. A equipe quer que o job termine mesmo quando linhas individuais falharem e localizar facilmente as linhas com falha para corrigi-las e reprocessá-las.
 
-**Questão**: Qual recurso de um endpoint Mosaic AI Model Serving implementa esse padrão canário?
+**Questão**: O que a equipe deve mudar?
 
-A) Limites de taxa no Unity AI Gateway — definir um limite para a v2 para que o tráfego passe naturalmente à v3  
-B) **Configuração de tráfego de endpoint multi-modelo** — registrar `v2` e `v3` como `served_entities` no mesmo endpoint e definir `traffic_config = {"routes": [{"served_model_name": "v3", "traffic_percentage": 10}, {"served_model_name": "v2", "traffic_percentage": 90}]}`  
-C) Guardrails do Unity AI Gateway — bloquear solicitações à v2 quando a v3 estiver saudável  
-D) Registro de payloads em Inference Tables — registrar cada solicitação e deixar que o consumidor escolha a versão  
+A) Dividir os sinistros em fatias de 1.000 linhas e chamar `ai_query()` uma vez por fatia em um loop Python com try/except, para que uma falha afete apenas uma fatia  
+B) Apontar `ai_query()` para um endpoint dedicado de provisioned throughput, para que o job tenha capacidade reservada e pare de falhar  
+C) Substituir a instrução SQL por chamadas a um endpoint de agente em tempo real, uma por sinistro, repetindo cada chamada com falha antes de seguir adiante  
+D) Adicionar `failOnError => false`, armazenar os campos `response` e `errorMessage` retornados e reprocessar as linhas em que `errorMessage` não é nulo  
 
 > [!success]- Resposta
-> **Resposta correta: B**
+> **Resposta correta: D**
 >
-> **Divisão de tráfego é um recurso do Mosaic AI Model Serving**, não uma política do Unity AI Gateway. Registre várias `served_entities` em um único endpoint e atribua pesos a `routes` usando `traffic_config`. Os pesos precisam somar 100; atualize as porcentagens ao longo do tempo para aumentar o tráfego gradualmente. Unity AI Gateway encapsula o endpoint para governança (limites de taxa, registro de payloads, guardrails, rastreamento de uso, fallbacks) — ele observa a divisão, mas não a define. A opção A usa limites de taxa incorretamente. A opção C usa guardrails incorretamente. A opção D não tem relação com a seleção de versão.
+> Trata-se de uma carga de trabalho em lote (milhões de linhas, execução agendada, ninguém aguardando), então `ai_query()` sobre a tabela continua sendo a ferramenta certa; o que falta é tratar erros por linha. Com `failOnError => false`, `ai_query()` retorna para cada linha um STRUCT com `response` e `errorMessage`, de modo que um erro do endpoint em uma linha não faz mais a consulta inteira falhar, e as linhas com falha ficam fáceis de selecionar, corrigir e reprocessar. Dividir os dados manualmente (A) contraria a orientação de enviar o conjunto de dados completo em uma única consulta, já que as AI Functions já gerenciam paralelização, novas tentativas e escalonamento. Provisioned throughput (B) acrescenta capacidade, mas capacidade não resolve uma entrada que excede a janela de contexto, então a mesma linha falha de novo. Um endpoint em tempo real (C) transforma uma única consulta em lote em milhões de chamadas individuais pelas quais nenhum usuário está esperando.
 
 ---
 
-### Questão EVAL-1 *(Média — Evaluation and Monitoring)*
+### Questão PROMPT-1 *(Média — Assembling and Deploying Applications)*
 
-**Cenário**: Uma equipe quer medir o desvio de qualidade de uma aplicação RAG em produção. Tem 30 dias de dados de Inference Tables (uma linha por solicitação, com prompt e resposta completos). Quer calcular *semanalmente* uma pontuação de groundedness em uma amostra do tráfego de produção, usando um LLM mais avançado como juiz.
+**Cenário**: Um agente de suporte no Model Serving carrega seu prompt de sistema a cada solicitação com `mlflow.genai.load_prompt("prompts:/main.prompts.support@production")`. Na segunda-feira, a equipe promoveu a versão 7 movendo o alias `production` para ela. Na terça-feira, o monitoramento mostra um pico de falhas em `Guidelines` causado pela nova redação. O engenheiro de plantão precisa restaurar imediatamente o comportamento da versão 6, sem alterar código nem reimplantar o agente, e a equipe quer manter a versão 7 para depuração.
 
-**Questão**: Qual abordagem corresponde ao padrão documentado de Agent Evaluation da Databricks?
+**Questão**: Qual ação atende aos três requisitos?
 
-A) Amostrar N linhas recentes da Inference Table em um Spark DataFrame; executar `mlflow.evaluate(data=sample, model_type="databricks-agent")` para que os juízes RAG integrados da Databricks (groundedness, relevance, correctness, safety) pontuem a amostra; agendar por meio de um Lakeflow Job  
-B) Ler manualmente 100 conversas aleatórias toda semana  
-C) Calcular uma pontuação de groundedness com uma regex sobre o texto da resposta  
-D) Treinar um classificador personalizado com dados de produção  
+A) Abrir a versão 7 no Prompt Registry e editar o template de volta para a redação da versão 6, com uma mensagem de commit explicando a mudança  
+B) Chamar `mlflow.genai.delete_prompt()` na versão 7, para que o agente volte a usar a versão restante mais recente do prompt  
+C) Chamar `mlflow.genai.set_prompt_alias()` para apontar `production` para a versão 6, mantendo as duas versões no registro  
+D) Chamar `mlflow.genai.delete_prompt_alias()` em `production`, para que o agente deixe de usar a versão 7 até que haja uma correção  
 
 > [!success]- Resposta
-> **Resposta correta: A**
+> **Resposta correta: C**
 >
-> O framework Agent Evaluation da Databricks integra-se a `mlflow.evaluate(...)` usando `model_type="databricks-agent"`. Os juízes RAG integrados incluem **groundedness** (a resposta decorre do contexto recuperado?), **answer relevance**, **answer correctness** e **safety**. Cada chamada de `mlflow.evaluate` cria uma execução MLflow, gerando uma série temporal rastreável da qualidade ao longo das semanas. Agende a execução com um Lakeflow Job. A opção B não escala. A opção C é frágil. A opção D exige meses de trabalho e é excessiva.
+> Versões de prompt são snapshots imutáveis e aliases são ponteiros mutáveis, então reverter significa mover o alias: `set_prompt_alias(name="main.prompts.support", alias="production", version=6)`. O agente resolve `@production` ao carregar o prompt, então passa a usar a versão 6 sem alteração de código nem nova implantação, e a versão 7 continua no histórico para depuração. A opção A não é possível: uma versão não pode ser editada, e `register_prompt()` com um novo texto cria uma nova versão. A opção B destrói a versão que a equipe quer manter, e o agente segue o alias, não a versão mais recente. A opção D remove o ponteiro que o agente carrega, então a busca por `@production` não tem o que resolver; `delete_prompt_alias()` mantém as versões, mas não reverte nada.
 
 ---
 

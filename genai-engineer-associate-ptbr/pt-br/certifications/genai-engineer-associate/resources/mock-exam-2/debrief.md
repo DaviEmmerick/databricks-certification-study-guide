@@ -71,11 +71,11 @@ Mapeamento heurístico de cada questão deste simulado ao domínio principal, à
 | 43 | Média | Design Applications | [pasta do tópico](../../03-design-applications/README.md) | [folha de referência](../../../../../../shared/fundamentals/rag-vector-search-basics.md) |
 | 44 | Difícil | Governance | [pasta do tópico](../../06-governance/README.md) | [folha de referência](../../../../../../shared/cheat-sheets/unity-catalog-quick-ref.md) |
 | 45 | Difícil | Design Applications | [pasta do tópico](../../03-design-applications/README.md) | [folha de referência](../../../../../../shared/fundamentals/rag-vector-search-basics.md) |
-| GOV-1 | Média | Governance | [pasta do tópico](../../06-governance/README.md) | [folha de referência](../../../../../../shared/cheat-sheets/unity-catalog-quick-ref.md) |
-| GOV-2 | Média | Governance | [pasta do tópico](../../06-governance/README.md) | [folha de referência](../../../../../../shared/cheat-sheets/unity-catalog-quick-ref.md) |
-| AGENT-1 | Média | Governance | [pasta do tópico](../../06-governance/README.md) | [folha de referência](../../../../../../shared/cheat-sheets/unity-catalog-quick-ref.md) |
-| GW-1 | Média | Governance | [pasta do tópico](../../06-governance/README.md) | [folha de referência](../../../../../../shared/cheat-sheets/unity-catalog-quick-ref.md) |
-| EVAL-1 | Média | Governance | [pasta do tópico](../../06-governance/README.md) | [folha de referência](../../../../../../shared/cheat-sheets/unity-catalog-quick-ref.md) |
+| DATA-1 | Difícil | Data Preparation | [pasta do tópico](../../04-data-preparation/README.md) | [folha de referência](../../../../../../shared/fundamentals/rag-vector-search-basics.md) |
+| APPDEV-1 | Média | Application Development | [pasta do tópico](../../01-application-development/README.md) | [folha de referência](../../../../../../shared/cheat-sheets/mlflow-quick-ref.md) |
+| APPDEV-2 | Difícil | Application Development | [pasta do tópico](../../01-application-development/README.md) | [folha de referência](../../../../../../shared/cheat-sheets/mlflow-quick-ref.md) |
+| BATCH-1 | Média | Assembling and Deploying Applications | [pasta do tópico](../../02-assembling-and-deploying-apps/README.md) | [folha de referência](../../../../../../shared/cheat-sheets/mlflow-quick-ref.md) |
+| PROMPT-1 | Média | Assembling and Deploying Applications | [pasta do tópico](../../02-assembling-and-deploying-apps/README.md) | [folha de referência](../../../../../../shared/cheat-sheets/mlflow-quick-ref.md) |
 
 ## Mapa de questões por seção
 
@@ -89,10 +89,9 @@ O arquivo questions.md do simulado GenAI é uma sequência contínua (uma quest�
 | Divisão em chunks / embeddings / criação de índices do Vector Search | Data Preparation (14 %) |
 | Avaliação do MLflow / LLM como juiz / tabelas de inferência / desvio | Evaluation and Monitoring (12 %) |
 | UC para ativos de IA / tratamento de PII / segurança de conteúdo / políticas do AI Gateway | Governance (8 %) |
-| Atualização: GOV-1, GOV-2 | Governance (8 %) |
-| Atualização: AGENT-1 | Assembling and Deploying Applications (22 %) |
-| Atualização: GW-1 | Assembling and Deploying Applications (22 %) — configuração de tráfego do Model Serving |
-| Atualização: EVAL-1 | Evaluation and Monitoring (12 %) |
+| Suplementares: DATA-1 | Data Preparation (14 %) |
+| Suplementares: APPDEV-1, APPDEV-2 | Application Development (30 %) |
+| Suplementares: BATCH-1, PROMPT-1 | Assembling and Deploying Applications (22 %) |
 
 ## Plano de estudos conforme o número de erros (simulado de 45 questões)
 

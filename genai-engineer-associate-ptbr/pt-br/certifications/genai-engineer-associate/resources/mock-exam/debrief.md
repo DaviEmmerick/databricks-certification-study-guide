@@ -73,9 +73,9 @@ Mapeamento heurístico de cada questão deste simulado ao domínio principal, à
 | 45 | Difícil | Evaluation and Monitoring | [pasta do tópico](../../05-evaluation-and-monitoring/README.md) | [folha de referência](../../../../../../shared/cheat-sheets/mlflow-quick-ref.md) |
 | GOV-1 | Média | Governance | [pasta do tópico](../../06-governance/README.md) | [folha de referência](../../../../../../shared/cheat-sheets/unity-catalog-quick-ref.md) |
 | GOV-2 | Média | Governance | [pasta do tópico](../../06-governance/README.md) | [folha de referência](../../../../../../shared/cheat-sheets/unity-catalog-quick-ref.md) |
-| AGENT-1 | Média | Governance | [pasta do tópico](../../06-governance/README.md) | [folha de referência](../../../../../../shared/cheat-sheets/unity-catalog-quick-ref.md) |
-| GW-1 | Média | Governance | [pasta do tópico](../../06-governance/README.md) | [folha de referência](../../../../../../shared/cheat-sheets/unity-catalog-quick-ref.md) |
-| EVAL-1 | Média | Governance | [pasta do tópico](../../06-governance/README.md) | [folha de referência](../../../../../../shared/cheat-sheets/unity-catalog-quick-ref.md) |
+| AGENT-1 | Média | Assembling and Deploying Applications | [pasta do tópico](../../02-assembling-and-deploying-apps/README.md) | [folha de referência](../../../../../../shared/cheat-sheets/mlflow-quick-ref.md) |
+| GW-1 | Média | Assembling and Deploying Applications | [pasta do tópico](../../02-assembling-and-deploying-apps/README.md) | [folha de referência](../../../../../../shared/cheat-sheets/mlflow-quick-ref.md) |
+| EVAL-1 | Média | Evaluation and Monitoring | [pasta do tópico](../../05-evaluation-and-monitoring/README.md) | [folha de referência](../../../../../../shared/cheat-sheets/mlflow-quick-ref.md) |
 
 ## Mapa de questões por seção
 
