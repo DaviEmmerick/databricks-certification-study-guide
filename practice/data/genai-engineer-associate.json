@@ -2,7 +2,7 @@
   "cert": "genai-engineer-associate",
   "certTitle": "GenAI Engineer Associate",
   "blueprintVersion": "Mar 18, 2026",
-  "generated": "2026-10-26",
+  "generated": "2026-11-04",
   "domains": [
     {
       "id": "rag-architecture",
@@ -20,7 +20,7 @@
       "id": "llm-application-development",
       "name": "Practice Questions — LLM Application Development",
       "sourceFile": "certifications/genai-engineer-associate/resources/practice-questions/03-llm-application-development.md",
-      "questionCount": 14
+      "questionCount": 16
     },
     {
       "id": "databricks-genai-tools",
@@ -38,13 +38,13 @@
       "id": "agents-mcp-and-deployment",
       "name": "Practice Questions — Agents, MCP & Deployment (2026 guide)",
       "sourceFile": "certifications/genai-engineer-associate/resources/practice-questions/06-agents-mcp-and-deployment.md",
-      "questionCount": 13
+      "questionCount": 15
     },
     {
       "id": "evaluation-monitoring-and-governance",
       "name": "Practice Questions — Evaluation, Monitoring & Governance (2026 guide)",
       "sourceFile": "certifications/genai-engineer-associate/resources/practice-questions/07-evaluation-monitoring-and-governance.md",
-      "questionCount": 12
+      "questionCount": 18
     }
   ],
   "questions": [
@@ -705,6 +705,38 @@
       "explanation": ""
     },
     {
+      "id": "03-llm-application-development-q015",
+      "domain": "llm-application-development",
+      "title": "Choosing a Chunk Size From Evaluation Results *(2026 guide)*",
+      "difficulty": "medium",
+      "question": "A team building a RAG assistant over HR policies runs a chunk-size sweep. Every run uses the same embedding model (`databricks-gte-large-en`), `k = 5`, the same LLM, and the same 150 evaluation questions with expected facts, scored with `mlflow.genai.evaluate()`. The requirement is to maximise the share of answers that contain all expected facts while keeping P95 latency under 3 seconds. Which option should the team adopt?\n\n```text\nChunk size / overlap   RetrievalSufficiency   Correctness   Avg prompt tokens   P95 latency\n256 / 25               0.64                   0.66          1600                1.4 s\n512 / 50               0.86                   0.84          2900                1.9 s\n1024 / 100             0.88                   0.85          5600                3.6 s\n```",
+      "choices": {
+        "A": "256 / 25, because the smallest chunks give the lowest latency and token cost",
+        "B": "1024 / 100, because it has the highest RetrievalSufficiency and Correctness",
+        "C": "512 / 50, because it is within a few points of the best quality and meets the latency target",
+        "D": "1024 / 100 with `k` lowered from 5 to 3, so that its prompt shrinks enough to meet the latency target"
+      },
+      "correctAnswer": "C",
+      "shortAnswer": "512 / 50: near-best quality inside the latency target.",
+      "explanation": "Treat chunking as a hyperparameter: drop every configuration that breaks the hard requirement, then pick the best of the rest on the primary metric. 1024 / 100 scores highest but misses the 3-second P95 target, so it is out. 256 / 25 is fastest but loses more than 20 points of RetrievalSufficiency, so needed facts are often not retrieved. Lowering `k` creates a new configuration that nobody has evaluated and that may drop the very facts that made the large chunks score well, while 512 / 50 already meets both requirements on measured results."
+    },
+    {
+      "id": "03-llm-application-development-q016",
+      "domain": "llm-application-development",
+      "title": "Changing Chunking After Conflicting Retrieval Scores *(2026 guide)*",
+      "difficulty": "hard",
+      "question": "A RAG assistant answers questions about equipment maintenance; each procedure is a 600–900-token section under its own heading. The team evaluates two chunking configurations on the same 200 questions with expected facts, using `RetrievalRelevance`, `RetrievalSufficiency`, and `Correctness`. Retrieved context must stay under 3,000 tokens per request. Reviewers report that with small chunks the top chunk is usually the right procedure, but the answer misses later steps, which rarely repeat the equipment or task name and so rank below the opening steps of similar procedures. Which change is most likely to raise RetrievalSufficiency while keeping the precise matching of small chunks and staying within the token budget?\n\n```text\nConfig                        RetrievalRelevance   RetrievalSufficiency   Correctness   Context tokens/request\nS: 200-token chunks, k = 5    0.88                 0.52                   0.55          ~1000\nL: 1024-token chunks, k = 5   0.47                 0.83                   0.80          ~5100\n```",
+      "choices": {
+        "A": "Keep config S and raise `k` from 5 to 20 so that more of each procedure's chunks are retrieved",
+        "B": "Index the 200-token chunks as children and send the LLM the parent section of the top 3 distinct procedures",
+        "C": "Keep config L and add a re-ranker so that the most relevant 1024-token chunks are ranked first",
+        "D": "Keep config S and raise the chunk overlap from 20 to 100 tokens so that steps at chunk boundaries stay together"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "Parent-child chunking: retrieve on the small chunks, return the parent section.",
+      "explanation": "The scores split the problem in two: small chunks find the right procedure (high relevance), but a 200-token chunk cannot hold a 600–900-token procedure, so sufficiency and correctness drop. Retrieving on child chunks keeps that precise matching, and returning each match's parent section supplies the missing steps; three sections of at most 900 tokens stay under the 3,000-token budget. Raising `k` to 20 pulls about 4,000 tokens, over the budget, and nothing ensures the extra results are the missing steps rather than more opening steps of similar procedures. A re-ranker only reorders the large chunks, which still mix procedures and still exceed the budget at `k = 5`. More overlap only repeats boundary sentences; each chunk is still far smaller than a procedure."
+    },
+    {
       "id": "04-databricks-genai-tools-q001",
       "domain": "databricks-genai-tools",
       "title": "Foundation Model API Endpoint Types",
@@ -1217,6 +1249,38 @@
       "explanation": "The App authenticates users with corporate identity and keeps credentials server-side; user authorization enforces per-user permissions. Every other option exposes secrets or data (official sample question 8)."
     },
     {
+      "id": "06-agents-mcp-and-deployment-q014",
+      "domain": "agents-mcp-and-deployment",
+      "title": "Post-Processing in a Pyfunc Model *(2026 guide)*",
+      "difficulty": "medium",
+      "question": "An engineer wraps a Foundation Model API call in a custom `mlflow.pyfunc.PythonModel` (imports and `PROMPT` are omitted). The prompt asks the LLM to reply with JSON that contains `category` and `priority`. A downstream job needs the served model to return a table with exactly those two columns, but it receives the raw reply strings, some of them wrapped in extra prose. Where should the fix go?\n\n```python\nclass TicketClassifier(mlflow.pyfunc.PythonModel):\n    def load_context(self, context):\n        self.client = get_deploy_client(\"databricks\")\n\n    def predict(self, context, model_input, params=None):\n        replies = []\n        for ticket in model_input[\"ticket\"]:\n            prompt = PROMPT.format(ticket=ticket)\n            resp = self.client.predict(\n                endpoint=\"databricks-claude-sonnet-4-5\",\n                inputs={\"messages\": [{\"role\": \"user\", \"content\": prompt}]},\n            )\n            replies.append(resp[\"choices\"][0][\"message\"][\"content\"])\n        return replies\n```",
+      "choices": {
+        "A": "In `load_context`, which MLflow runs on each prediction's output before returning it to the caller",
+        "B": "In the `signature` passed to `mlflow.pyfunc.log_model()`, declaring `category` and `priority` as outputs so that MLflow converts each reply",
+        "C": "In the request, by setting `temperature` to 0 so that every reply is valid JSON containing both keys",
+        "D": "At the end of `predict`, by parsing the JSON in each reply, falling back to defaults when parsing fails, and returning a DataFrame with the two columns"
+      },
+      "correctAnswer": "D",
+      "shortAnswer": "Post-process at the end of `predict`.",
+      "explanation": "Post-processing turns each raw model output into the shape consumers need, so it runs per request inside `predict`, after the LLM call; the Databricks custom pyfunc pattern calls a `format_outputs()` helper just before returning. `load_context` runs once when the model is loaded, never on each output. A signature describes the model's interface, and MLflow validates inputs against it but does not validate or convert outputs. Temperature 0 makes replies more repeatable but does not guarantee the format, so parsing with a fallback is still needed."
+    },
+    {
+      "id": "06-agents-mcp-and-deployment-q015",
+      "domain": "agents-mcp-and-deployment",
+      "title": "Packaging a Lookup File for Post-Processing *(2026 guide)*",
+      "difficulty": "hard",
+      "question": "A custom pyfunc model routes support tickets. `redact()` masks email addresses before the prompt is built, and the LLM's category label is then mapped to a queue ID with a JSON lookup file (imports, `PROMPT`, `redact()`, and `ask_llm()` are defined in the same file). A reviewer requires every registered model version to keep the exact mapping it was evaluated with, even if someone later edits the file in the volume. What should the engineer change?\n\n```python\nclass TicketRouter(mlflow.pyfunc.PythonModel):\n    def load_context(self, context):\n        self.client = get_deploy_client(\"databricks\")\n        with open(\"/Volumes/main/support/config/queues.json\") as f:\n            self.queues = json.load(f)\n\n    def predict(self, context, model_input, params=None):\n        queue_ids = []\n        for ticket in model_input[\"ticket\"]:\n            prompt = PROMPT.format(ticket=redact(ticket))\n            label = ask_llm(self.client, prompt).strip().lower()\n            queue_ids.append(self.queues.get(label, \"TRIAGE\"))\n        return pd.DataFrame({\"queue_id\": queue_ids})\n```",
+      "choices": {
+        "A": "Pass `artifacts={\"queues\": \"/Volumes/main/support/config/queues.json\"}` to `mlflow.pyfunc.log_model()` and open `context.artifacts[\"queues\"]` in `load_context`",
+        "B": "Declare the JSON file in the `resources` argument of `mlflow.pyfunc.log_model()` so that deployment provisions it together with the model",
+        "C": "Move the file read into `predict` so that each request applies the latest mapping from the volume",
+        "D": "Put the mapping inside the `input_example` passed to `mlflow.pyfunc.log_model()`, because the input example is saved with the model"
+      },
+      "correctAnswer": "A",
+      "shortAnswer": "Log the file as a model artifact and load it from `context.artifacts`.",
+      "explanation": "As written, the mapping lives outside the logged model, so a version's behaviour depends on what the volume contains when the model loads, not on what was evaluated. Files passed in `artifacts` are downloaded into the model directory when it is logged, and `context.artifacts[\"queues\"]` gives the local path of that copy; loading it in `load_context` keeps it a one-time step, while `redact()` and the lookup stay in `predict` because they depend on each request. `resources` declares Databricks resources such as serving endpoints and Vector Search indexes so deployment can provision access; it does not package files. Reading the volume in `predict` does the opposite of the requirement and adds file I/O to every request, and an input example is a sample request, not configuration that `predict` can read."
+    },
+    {
       "id": "07-evaluation-monitoring-and-governance-q001",
       "domain": "evaluation-monitoring-and-governance",
       "title": "Judges That Need Ground Truth *(2026 guide)*",
@@ -1407,6 +1471,102 @@
       "correctAnswer": "D",
       "shortAnswer": "Licence and terms of service, with provenance recorded.",
       "explanation": "Copyright, licence conditions (such as non-commercial clauses), and terms of service determine whether content may be used. Recording source and licence as metadata lets you remove or audit content later."
+    },
+    {
+      "id": "07-evaluation-monitoring-and-governance-q013",
+      "domain": "evaluation-monitoring-and-governance",
+      "title": "Smallest Model That Meets the Bar *(2026 guide)*",
+      "difficulty": "medium",
+      "question": "A team classifies about two million support tickets into 12 categories in a nightly batch job. The requirement is an accuracy of at least 0.90 on their labelled evaluation set at the lowest possible serving cost; latency does not matter. They evaluated three candidates on the same evaluation dataset with the same scorers: a 70B dense model (accuracy 0.94, $5.00 per 1,000 tickets), a mixture-of-experts (MoE) model with 120B total and 10B active parameters (accuracy 0.93, $1.80 per 1,000 tickets), and an 8B dense model (accuracy 0.91, $0.40 per 1,000 tickets). Which choice is best?",
+      "choices": {
+        "A": "The 70B dense model, because it has the highest accuracy",
+        "B": "The MoE model, because it offers the best balance of accuracy and cost",
+        "C": "The 8B dense model, because it meets the accuracy requirement at the lowest cost",
+        "D": "None yet; compare the models' public benchmark scores from their model cards first"
+      },
+      "correctAnswer": "C",
+      "shortAnswer": "The 8B dense model.",
+      "explanation": "The requirement sets a quality floor and then minimises cost, so every candidate above 0.90 is good enough and the cheapest of them wins. The 8B model clears the bar at $0.40 per 1,000 tickets: about $800 a night against $10,000 for the 70B model and $3,600 for the MoE model. Accuracy above the threshold earns nothing under this requirement, and \"best balance\" is not the stated rule. Public benchmarks are only a starting point; results on the team's own evaluation set are the evidence."
+    },
+    {
+      "id": "07-evaluation-monitoring-and-governance-q014",
+      "domain": "evaluation-monitoring-and-governance",
+      "title": "Safety, Quality, and Latency Gates *(2026 guide)*",
+      "difficulty": "hard",
+      "question": "A customer-facing RAG assistant must pass three gates: a Safety judge pass rate of 100 %, a Correctness score of at least 0.85, and P95 latency under 2 seconds. Among models that pass all three, the lowest cost per request wins. Four candidates were run through `mlflow.genai.evaluate()` on the same evaluation dataset with the same scorers. Model W, a 70B dense model: Correctness 0.91, Safety 100 %, P95 2.8 s, $6.00 per 1,000 requests. Model X, an 8B dense model fine-tuned on support tickets: Correctness 0.87, Safety 97 %, P95 0.6 s, $0.90. Model Y, an 8B dense instruction-tuned model: Correctness 0.76, Safety 100 %, P95 0.5 s, $0.70. Model Z, a mixture-of-experts (MoE) model with 400B total and 17B active parameters: Correctness 0.88, Safety 100 %, P95 1.4 s, $2.50. Which model should the team choose?",
+      "choices": {
+        "A": "Model W, because it has the highest Correctness score and passes the Safety gate",
+        "B": "Model X, because it clears the Correctness bar at low latency and low cost",
+        "C": "Model Y, because it is the cheapest model that passes the Safety gate",
+        "D": "Model Z, because it is the only model that passes all three gates"
+      },
+      "correctAnswer": "D",
+      "shortAnswer": "Model Z, the MoE model.",
+      "explanation": "Apply the gates in order. Safety is a hard gate, so Model X is out at 97 % whatever its cost; Model Y fails the Correctness threshold and Model W fails the latency limit, which leaves Model Z. Its 400B total parameters do not make it the most expensive option: an MoE model activates only a subset of its parameters per token (17B here), which is why its measured latency and cost sit below those of the 70B dense model. Decide from the measured metrics, not from parameter counts."
+    },
+    {
+      "id": "07-evaluation-monitoring-and-governance-q015",
+      "domain": "evaluation-monitoring-and-governance",
+      "title": "Scoring Logged Production Answers *(2026 guide)*",
+      "difficulty": "medium",
+      "question": "A RAG assistant has run on a Model Serving endpoint for a month with payload logging to an inference table. Users say the answers have become less helpful, yet the team's pre-launch evaluation dataset still scores well. The team wants to measure answer quality on the questions users actually asked last week, without re-running the application and without ground-truth answers. What should they do?",
+      "choices": {
+        "A": "Compare tokens per request in `system.serving.endpoint_usage` for last week against launch week, and treat a rise in tokens as a drop in answer quality",
+        "B": "Sample last week's inference-table rows, map each logged question to `inputs` and each logged answer to `outputs`, and score them with `mlflow.genai.evaluate()` using judges that need no ground truth, such as `RelevanceToQuery`",
+        "C": "Re-run the pre-launch evaluation dataset through the endpoint every day and alert as soon as its aggregate judge scores start to drop",
+        "D": "Compute last week's error rate from the inference table's `status_code` column, counting every request that returned HTTP 200 as a good answer"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "Evaluate a sample of the logged requests and responses with judges that need no ground truth.",
+      "explanation": "The inference table stores the raw request and response JSON of real traffic, so a sample of last week's rows is an evaluation dataset of production questions. `mlflow.genai.evaluate()` accepts inputs with pre-computed outputs and no `predict_fn`, building traces from them, and judges such as `RelevanceToQuery` and `Safety` score without expectations. The pre-launch dataset keeps passing because it no longer reflects what users ask. An HTTP 200 only means the endpoint replied, and the usage table records tokens, not answer content."
+    },
+    {
+      "id": "07-evaluation-monitoring-and-governance-q016",
+      "domain": "evaluation-monitoring-and-governance",
+      "title": "Retrieval or Generation Failure *(2026 guide)*",
+      "difficulty": "hard",
+      "question": "A policy-assistant RAG app returns the retrieved chunks with every answer for citations, so both are logged in the `response` column of its inference table. An LLM judge run over 400 rows sampled from last week flags 30 % of answers as not supported by their logged chunks. For most flagged rows, the engineer reads the chunks logged for the same request and finds that they are on-topic and contain the correct figure, but the answer states a different figure or adds claims found in no chunk. What does this assessment indicate, and what should the team change first?",
+      "choices": {
+        "A": "Generation is failing: strengthen the prompt's grounding instructions (answer only from the provided context and cite it) or evaluate a different LLM, then re-evaluate the new version on the same logged questions",
+        "B": "Retrieval is failing: re-chunk the documents into smaller chunks with more overlap and rebuild the Vector Search index",
+        "C": "The model sees too little evidence: increase the number of chunks retrieved per query",
+        "D": "The embeddings are truncated: switch to an embedding model with a longer context window and re-embed the corpus"
+      },
+      "correctAnswer": "A",
+      "shortAnswer": "A generation problem; fix the prompt or the model first.",
+      "explanation": "Because the logs hold each answer next to the exact context it was given, the team can tell the two halves of the pipeline apart: retrieval delivered the right facts, and generation did not stay faithful to them. Low groundedness with relevant retrieved context points to the prompt or the model. Re-chunking, re-embedding, or retrieving more chunks would change the part that already works, and extra chunks can add noise. Had the logged chunks been empty or off-topic, retrieval would be the first fix."
+    },
+    {
+      "id": "07-evaluation-monitoring-and-governance-q017",
+      "domain": "evaluation-monitoring-and-governance",
+      "title": "Toxic Passages in a Source Corpus *(2026 guide)*",
+      "difficulty": "medium",
+      "question": "A team builds a customer-facing RAG assistant on five years of community forum threads. Spot checks show that some threads contain insults and offensive language, and the assistant occasionally repeats that language in its answers. The team wants to fix this for every query without adding work to each request. What is the best mitigation?",
+      "choices": {
+        "A": "Enable the AI Gateway safety guardrail on the serving endpoint so offensive output is blocked",
+        "B": "Add a system-prompt instruction telling the model never to use offensive language",
+        "C": "Restrict the forum table with Unity Catalog permissions so that only support staff can query it",
+        "D": "Run a toxicity classifier over the forum passages during ingestion and exclude flagged passages before chunking and embedding"
+      },
+      "correctAnswer": "D",
+      "shortAnswer": "Filter toxic passages out at ingestion.",
+      "explanation": "The problem lives in the source data, so the best fix is upstream: a toxicity classifier at ingestion removes offensive passages before they are chunked and embedded, so they can never be retrieved. That fixes every query at once and adds no per-request cost. The gateway guardrail checks every request and response, which makes it a useful backstop but not the strategy, and a prompt instruction still leaves the toxic text in the retrieved context. Unity Catalog permissions decide who can read the data, not whether its text is fit to use."
+    },
+    {
+      "id": "07-evaluation-monitoring-and-governance-q018",
+      "domain": "evaluation-monitoring-and-governance",
+      "title": "Conflicting Copies of a Policy *(2026 guide)*",
+      "difficulty": "hard",
+      "question": "An HR assistant indexes two sources: the official HR policy repository and an internal wiki where teams pasted copies of policies and edited some of them over the years. When the two disagree, the assistant sometimes quotes the wiki's altered figures, such as an outdated travel allowance. Answers must reflect the official policy, and the team cannot add per-request latency. Which recommendation best mitigates the problem?",
+      "choices": {
+        "A": "Add a system-prompt rule: \"If sources disagree, prefer the HR policy repository\"",
+        "B": "Turn on AI Gateway output guardrails to block answers that contain incorrect policy figures",
+        "C": "Keep the HR policy repository as the single source for policies: remove the wiki's policy copies from ingestion and rebuild the index",
+        "D": "Add a re-ranker and retrieve more chunks per query so the official version always appears next to the wiki copy"
+      },
+      "correctAnswer": "C",
+      "shortAnswer": "Use the system of record and remove the conflicting copies at the source.",
+      "explanation": "Contradictory sources are a data problem, and the recommended mitigation is to choose the system of record and remove the conflicting copies at ingestion; the altered figures then can never be retrieved, at no per-request cost. A prompt rule leaves both versions in the context and relies on the model to tell them apart, which fails when chunks do not show their source. Gateway guardrails detect unsafe content and PII, not wrong policy numbers. A re-ranker and more retrieved chunks add latency and still put conflicting text in front of the model."
     }
   ]
 }

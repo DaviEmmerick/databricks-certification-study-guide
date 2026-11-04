@@ -7,7 +7,7 @@ status: published
 
 # Questões de prática — Avaliação, monitoramento e governança (guia de 2026)
 
-12 questões sobre itens do guia do exame de 2026 em Evaluation and Monitoring e Governance: scoring e tracing do MLflow, juízes que precisam de ground truth, scorers personalizados, feedback de SMEs, Agent Monitoring, tabelas de inferência e uso do AI Gateway, limites de taxa, controle de custos, mascaramento, guardrails, licenciamento e texto problemático. Material de estudo: [Scorers do MLflow e feedback de SMEs](../../05-evaluation-and-monitoring/03-mlflow-scorers-judges-and-feedback.md), [AI Gateway: uso e controle de custos](../../05-evaluation-and-monitoring/04-ai-gateway-usage-and-cost-control.md), [Visão geral da governança](../../06-governance/01-governance-overview.md).
+18 questões sobre itens do guia do exame de 2026 em Evaluation and Monitoring e Governance: scoring e tracing do MLflow, escolha de tamanho e arquitetura de modelo a partir de métricas de avaliação, registro de inferências em aplicações RAG implantadas, juízes que precisam de ground truth, scorers personalizados, feedback de SMEs, Agent Monitoring, tabelas de inferência e uso do AI Gateway, limites de taxa, controle de custos, mascaramento, guardrails, licenciamento e texto problemático. Material de estudo: [Scorers do MLflow e feedback de SMEs](../../05-evaluation-and-monitoring/03-mlflow-scorers-judges-and-feedback.md), [AI Gateway: uso e controle de custos](../../05-evaluation-and-monitoring/04-ai-gateway-usage-and-cost-control.md), [Visão geral da governança](../../06-governance/01-governance-overview.md).
 
 ---
 
@@ -223,7 +223,115 @@ D) A licença de conteúdo e os termos de serviço do site e, então, registrar 
 >
 > Licença e termos de serviço, com registro de procedência.
 >
-Direitos autorais, condições da licença (como cláusulas de uso não comercial) e termos de serviço determinam se o conteúdo pode ser usado. Registrar a origem e a licença como metadados permite remover ou auditar o conteúdo posteriormente.
+> Direitos autorais, condições da licença (como cláusulas de uso não comercial) e termos de serviço determinam se o conteúdo pode ser usado. Registrar a origem e a licença como metadados permite remover ou auditar o conteúdo posteriormente.
+
+---
+
+## Questão 13 *(Média)*: O menor modelo que atende ao requisito *(guia de 2026)*
+
+**Questão**: Uma equipe classifica cerca de dois milhões de tickets de suporte em 12 categorias em um job noturno em lote. O requisito é uma acurácia de pelo menos 0,90 no conjunto de avaliação rotulado, com o menor custo de serving possível; a latência não importa. A equipe avaliou três candidatos no mesmo conjunto de dados de avaliação, com os mesmos scorers: um modelo denso de 70B (acurácia de 0,94, US$ 5,00 por 1.000 tickets), um modelo mixture-of-experts (MoE) com 120B de parâmetros totais e 10B ativos (acurácia de 0,93, US$ 1,80 por 1.000 tickets) e um modelo denso de 8B (acurácia de 0,91, US$ 0,40 por 1.000 tickets). Qual é a melhor escolha?
+
+A) O modelo denso de 70B, porque tem a maior acurácia  
+B) O modelo MoE, porque oferece o melhor equilíbrio entre acurácia e custo  
+C) O modelo denso de 8B, porque atende ao requisito de acurácia com o menor custo  
+D) Nenhum por enquanto; primeiro compare as pontuações dos modelos em benchmarks públicos, nos model cards  
+
+> [!success]- Resposta
+> **Resposta correta: C**
+>
+> O modelo denso de 8B.
+>
+> O requisito define um piso de qualidade e, depois, minimiza o custo; portanto, qualquer candidato acima de 0,90 é suficiente, e o mais barato deles vence. O modelo de 8B ultrapassa o limite a US$ 0,40 por 1.000 tickets: cerca de US$ 800 por noite, contra US$ 10.000 do modelo de 70B e US$ 3.600 do modelo MoE. Acurácia acima do limite não traz ganho algum sob esse requisito, e "melhor equilíbrio" não é a regra declarada. Benchmarks públicos são apenas um ponto de partida; os resultados no conjunto de avaliação da própria equipe são a evidência.
+
+---
+
+## Questão 14 *(Difícil)*: Critérios eliminatórios de segurança, qualidade e latência *(guia de 2026)*
+
+**Questão**: Um assistente RAG voltado a clientes precisa passar por três critérios eliminatórios: taxa de aprovação de 100 % no juiz Safety, pontuação Correctness de pelo menos 0,85 e latência P95 abaixo de 2 segundos. Entre os modelos que passam pelos três, vence o de menor custo por solicitação. Quatro candidatos foram executados com `mlflow.genai.evaluate()` no mesmo conjunto de dados de avaliação, com os mesmos scorers. Modelo W, um modelo denso de 70B: Correctness 0,91, Safety 100 %, P95 2,8 s, US$ 6,00 por 1.000 solicitações. Modelo X, um modelo denso de 8B ajustado com tickets de suporte: Correctness 0,87, Safety 97 %, P95 0,6 s, US$ 0,90. Modelo Y, um modelo denso de 8B ajustado por instruções: Correctness 0,76, Safety 100 %, P95 0,5 s, US$ 0,70. Modelo Z, um modelo mixture-of-experts (MoE) com 400B de parâmetros totais e 17B ativos: Correctness 0,88, Safety 100 %, P95 1,4 s, US$ 2,50. Qual modelo a equipe deve escolher?
+
+A) Modelo W, porque tem a maior pontuação Correctness e passa pelo critério de Safety  
+B) Modelo X, porque ultrapassa o limite de Correctness com baixa latência e custo baixo  
+C) Modelo Y, porque é o modelo mais barato que passa pelo critério de Safety  
+D) Modelo Z, porque é o único modelo que passa pelos três critérios  
+
+> [!success]- Resposta
+> **Resposta correta: D**
+>
+> Modelo Z, o modelo MoE.
+>
+> Aplique os critérios em ordem. Safety é eliminatório, então o Modelo X fica de fora com 97 %, seja qual for seu custo; o Modelo Y não atinge o limite de Correctness e o Modelo W excede o limite de latência, o que deixa o Modelo Z. Seus 400B de parâmetros totais não o tornam a opção mais cara: um modelo MoE ativa apenas um subconjunto dos parâmetros por token (aqui, 17B), e é por isso que sua latência e seu custo medidos ficam abaixo dos do modelo denso de 70B. Decida pelas métricas medidas, não pela contagem de parâmetros.
+
+---
+
+## Questão 15 *(Média)*: Pontuar respostas de produção registradas *(guia de 2026)*
+
+**Questão**: Um assistente RAG está em execução há um mês em um endpoint do Model Serving, com registro de payloads em uma tabela de inferência. Os usuários dizem que as respostas ficaram menos úteis, mas o conjunto de dados de avaliação anterior ao lançamento continua com boas pontuações. A equipe quer medir a qualidade das respostas às perguntas que os usuários realmente fizeram na semana passada, sem executar o aplicativo novamente e sem respostas de ground truth. O que ela deve fazer?
+
+A) Comparar os tokens por solicitação em `system.serving.endpoint_usage` da semana passada com os da semana de lançamento e tratar um aumento de tokens como uma queda na qualidade das respostas  
+B) Amostrar as linhas da semana passada na tabela de inferência, mapear cada pergunta registrada para `inputs` e cada resposta registrada para `outputs` e pontuá-las com `mlflow.genai.evaluate()` usando juízes que não precisam de ground truth, como `RelevanceToQuery`  
+C) Executar diariamente o conjunto de dados de avaliação anterior ao lançamento no endpoint e gerar um alerta assim que as pontuações agregadas dos juízes começarem a cair  
+D) Calcular a taxa de erros da semana passada com a coluna `status_code` da tabela de inferência, contando como boa resposta toda solicitação que retornou HTTP 200  
+
+> [!success]- Resposta
+> **Resposta correta: B**
+>
+> Avaliar uma amostra das solicitações e respostas registradas com juízes que não precisam de ground truth.
+>
+> A tabela de inferência armazena o JSON bruto da solicitação e da resposta do tráfego real; por isso, uma amostra das linhas da semana passada é um conjunto de dados de avaliação com perguntas de produção. `mlflow.genai.evaluate()` aceita entradas com saídas pré-calculadas e sem `predict_fn`, construindo traces a partir delas, e juízes como `RelevanceToQuery` e `Safety` pontuam sem expectativas. O conjunto anterior ao lançamento continua aprovado porque não reflete mais o que os usuários perguntam. Um HTTP 200 significa apenas que o endpoint respondeu, e a tabela de uso registra tokens, não o conteúdo das respostas.
+
+---
+
+## Questão 16 *(Difícil)*: Falha de recuperação ou de geração *(guia de 2026)*
+
+**Questão**: Um aplicativo RAG de assistente de políticas retorna os chunks recuperados com cada resposta, para fins de citação; por isso, ambos ficam registrados na coluna `response` da tabela de inferência. Um juiz LLM executado sobre 400 linhas amostradas da semana passada sinaliza 30 % das respostas como não fundamentadas nos chunks registrados. Na maioria das linhas sinalizadas, o engenheiro lê os chunks registrados para a mesma solicitação e descobre que eles tratam do assunto certo e contêm o valor correto, mas a resposta informa um valor diferente ou acrescenta afirmações que não aparecem em nenhum chunk. O que essa avaliação indica e o que a equipe deve mudar primeiro?
+
+A) A geração está falhando: reforçar as instruções de fundamentação do prompt (responder somente com base no contexto fornecido e citá-lo) ou avaliar outro LLM e, depois, avaliar a nova versão com as mesmas perguntas registradas  
+B) A recuperação está falhando: refazer o chunking dos documentos com chunks menores e mais sobreposição e reconstruir o índice do Vector Search  
+C) O modelo recebe pouca evidência: aumentar o número de chunks recuperados por consulta  
+D) Os embeddings estão truncados: trocar por um modelo de embedding com janela de contexto maior e gerar novamente os embeddings do corpus  
+
+> [!success]- Resposta
+> **Resposta correta: A**
+>
+> Um problema de geração; corrija primeiro o prompt ou o modelo.
+>
+> Como os logs guardam cada resposta ao lado do contexto exato que o modelo recebeu, a equipe consegue separar as duas metades do pipeline: a recuperação entregou os fatos certos, e a geração não se manteve fiel a eles. Baixa fundamentação com contexto recuperado relevante aponta para o prompt ou para o modelo. Refazer o chunking, gerar novamente os embeddings ou recuperar mais chunks mudaria a parte que já funciona, e chunks extras podem acrescentar ruído. Se os chunks registrados estivessem vazios ou fora do assunto, a recuperação seria a primeira correção.
+
+---
+
+## Questão 17 *(Média)*: Trechos tóxicos em um corpus de origem *(guia de 2026)*
+
+**Questão**: Uma equipe cria um assistente RAG voltado a clientes com base em cinco anos de tópicos de um fórum da comunidade. Verificações por amostragem mostram que alguns tópicos contêm insultos e linguagem ofensiva, e o assistente às vezes repete essa linguagem nas respostas. A equipe quer corrigir isso para todas as consultas sem acrescentar trabalho a cada solicitação. Qual é a melhor mitigação?
+
+A) Habilitar o guardrail de segurança do AI Gateway no endpoint de serving para bloquear saídas ofensivas  
+B) Adicionar ao system prompt uma instrução que proíba o modelo de usar linguagem ofensiva  
+C) Restringir a tabela do fórum com permissões do Unity Catalog para que somente a equipe de suporte possa consultá-la  
+D) Executar um classificador de toxicidade sobre os trechos do fórum durante a ingestão e excluir os trechos sinalizados antes do chunking e da geração de embeddings  
+
+> [!success]- Resposta
+> **Resposta correta: D**
+>
+> Filtrar os trechos tóxicos na ingestão.
+>
+> O problema está nos dados de origem; portanto, a melhor correção é a montante: um classificador de toxicidade na ingestão remove os trechos ofensivos antes que sejam divididos em chunks e convertidos em embeddings, de modo que nunca possam ser recuperados. Isso corrige todas as consultas de uma vez e não acrescenta custo por solicitação. O guardrail do gateway verifica cada solicitação e resposta, o que o torna uma proteção de reserva útil, mas não a estratégia; e uma instrução no prompt ainda deixa o texto tóxico no contexto recuperado. As permissões do Unity Catalog decidem quem pode ler os dados, não se o texto é adequado para uso.
+
+---
+
+## Questão 18 *(Difícil)*: Cópias conflitantes de uma política *(guia de 2026)*
+
+**Questão**: Um assistente de RH indexa duas fontes: o repositório oficial de políticas de RH e uma wiki interna em que as equipes colaram cópias das políticas e editaram algumas delas ao longo dos anos. Quando as duas divergem, o assistente às vezes cita os valores alterados da wiki, como uma diária de viagem desatualizada. As respostas precisam refletir a política oficial, e a equipe não pode acrescentar latência por solicitação. Qual recomendação mitiga melhor o problema?
+
+A) Adicionar uma regra ao system prompt: "Se as fontes divergirem, prefira o repositório de políticas de RH"  
+B) Ativar os guardrails de saída do AI Gateway para bloquear respostas que contenham valores de política incorretos  
+C) Manter o repositório de políticas de RH como fonte única das políticas: remover da ingestão as cópias de políticas da wiki e reconstruir o índice  
+D) Adicionar um re-ranker e recuperar mais chunks por consulta para que a versão oficial sempre apareça ao lado da cópia da wiki  
+
+> [!success]- Resposta
+> **Resposta correta: C**
+>
+> Usar o sistema de registro e remover as cópias conflitantes na origem.
+>
+> Fontes contraditórias são um problema de dados, e a mitigação recomendada é escolher o sistema de registro e remover as cópias conflitantes na ingestão; assim, os valores alterados nunca podem ser recuperados, sem custo por solicitação. Uma regra no prompt deixa as duas versões no contexto e depende de o modelo distingui-las, o que falha quando os chunks não indicam sua origem. Os guardrails do gateway detectam conteúdo inseguro e PII, não números de política errados. Um re-ranker e mais chunks recuperados acrescentam latência e ainda colocam texto conflitante diante do modelo.
 
 ---
 

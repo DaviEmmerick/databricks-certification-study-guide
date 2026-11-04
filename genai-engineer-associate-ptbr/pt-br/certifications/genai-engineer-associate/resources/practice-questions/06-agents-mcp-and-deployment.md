@@ -7,7 +7,7 @@ status: published
 
 # Questões de prática — Agentes, MCP e implantação (guia de 2026)
 
-13 questões sobre itens do guia do exame de 2026 nas áreas Application Development e Assembling and Deploying Applications: MLflow + Agent Framework, Genie em sistemas multiagente, seleção de modelos, servidores MCP, controle de acesso de endpoints de serving, `ai_query()`, memória persistente, CI/CD, ciclo de vida de prompts e interfaces de usuário. Material de estudo: [Sistemas agênticos](../../01-application-development/05-agentic-systems-mlflow-and-genie.md), [Seleção de modelos](../../01-application-development/06-model-selection-and-response-quality.md), [Servidores MCP](../../02-assembling-and-deploying-apps/04-mcp-servers.md), [Controle de acesso e inferência em lote](../../02-assembling-and-deploying-apps/05-access-control-and-batch-inference.md), [Memória, CI/CD, prompts e interfaces](../../02-assembling-and-deploying-apps/06-memory-cicd-prompts-and-interfaces.md).
+15 questões sobre itens do guia do exame de 2026 nas áreas Application Development e Assembling and Deploying Applications: MLflow + Agent Framework, Genie em sistemas multiagente, seleção de modelos, servidores MCP, controle de acesso de endpoints de serving, `ai_query()`, memória persistente, CI/CD, ciclo de vida de prompts, interfaces de usuário e chains pyfunc com pré e pós-processamento. Material de estudo: [Sistemas agênticos](../../01-application-development/05-agentic-systems-mlflow-and-genie.md), [Seleção de modelos](../../01-application-development/06-model-selection-and-response-quality.md), [Servidores MCP](../../02-assembling-and-deploying-apps/04-mcp-servers.md), [Controle de acesso e inferência em lote](../../02-assembling-and-deploying-apps/05-access-control-and-batch-inference.md), [Memória, CI/CD, prompts e interfaces](../../02-assembling-and-deploying-apps/06-memory-cicd-prompts-and-interfaces.md).
 
 ---
 
@@ -242,6 +242,75 @@ D) Usar um Databricks App cujo backend chame o endpoint do agente com as credenc
 > O backend de um Databricks App chama o agente.
 >
 > O App autentica os usuários com a identidade corporativa e mantém as credenciais no servidor; a autorização do usuário aplica as permissões individuais. Todas as outras opções expõem secrets ou dados (questão 8 do exemplo oficial).
+
+---
+
+## Questão 14 *(Média)*: Pós-processamento em um modelo pyfunc *(guia de 2026)*
+
+**Questão**: Um engenheiro encapsula uma chamada à Foundation Model API em um `mlflow.pyfunc.PythonModel` personalizado (os imports e `PROMPT` foram omitidos). O prompt pede ao LLM que responda com um JSON contendo `category` e `priority`. Um job downstream precisa que o modelo servido retorne uma tabela com exatamente essas duas colunas, mas recebe as strings brutas das respostas, algumas envolvidas em texto extra. Onde a correção deve ficar?
+
+```python
+class TicketClassifier(mlflow.pyfunc.PythonModel):
+    def load_context(self, context):
+        self.client = get_deploy_client("databricks")
+
+    def predict(self, context, model_input, params=None):
+        replies = []
+        for ticket in model_input["ticket"]:
+            prompt = PROMPT.format(ticket=ticket)
+            resp = self.client.predict(
+                endpoint="databricks-claude-sonnet-4-5",
+                inputs={"messages": [{"role": "user", "content": prompt}]},
+            )
+            replies.append(resp["choices"][0]["message"]["content"])
+        return replies
+```
+
+A) Em `load_context`, que o MLflow executa sobre a saída de cada predição antes de devolvê-la a quem chamou  
+B) Na `signature` passada a `mlflow.pyfunc.log_model()`, declarando `category` e `priority` como saídas para que o MLflow converta cada resposta  
+C) Na solicitação, definindo `temperature` como 0 para que toda resposta seja um JSON válido com as duas chaves  
+D) No final de `predict`, extraindo o JSON de cada resposta, usando valores padrão quando a análise falhar e retornando um DataFrame com as duas colunas  
+
+> [!success]- Resposta
+> **Resposta correta: D**
+>
+> Faça o pós-processamento no final de `predict`.
+>
+> O pós-processamento transforma cada saída bruta do modelo no formato de que os consumidores precisam, por isso é executado a cada solicitação dentro de `predict`, depois da chamada ao LLM; o padrão de pyfunc personalizado da Databricks chama um helper `format_outputs()` logo antes do retorno. `load_context` é executado uma única vez, quando o modelo é carregado, e nunca sobre cada saída. Uma assinatura (`signature`) descreve a interface do modelo, e o MLflow valida as entradas com base nela, mas não valida nem converte as saídas. `temperature` 0 torna as respostas mais repetíveis, mas não garante o formato, então a análise com um valor padrão continua necessária.
+
+---
+
+## Questão 15 *(Difícil)*: Empacotar um arquivo de consulta para o pós-processamento *(guia de 2026)*
+
+**Questão**: Um modelo pyfunc personalizado encaminha tickets de suporte. `redact()` mascara endereços de e-mail antes de o prompt ser montado, e o rótulo de categoria retornado pelo LLM é depois convertido em um ID de fila por meio de um arquivo JSON de consulta (os imports, `PROMPT`, `redact()` e `ask_llm()` estão definidos no mesmo arquivo). Um revisor exige que cada versão registrada do modelo mantenha exatamente o mapeamento com que foi avaliada, mesmo que alguém edite depois o arquivo no volume. O que o engenheiro deve mudar?
+
+```python
+class TicketRouter(mlflow.pyfunc.PythonModel):
+    def load_context(self, context):
+        self.client = get_deploy_client("databricks")
+        with open("/Volumes/main/support/config/queues.json") as f:
+            self.queues = json.load(f)
+
+    def predict(self, context, model_input, params=None):
+        queue_ids = []
+        for ticket in model_input["ticket"]:
+            prompt = PROMPT.format(ticket=redact(ticket))
+            label = ask_llm(self.client, prompt).strip().lower()
+            queue_ids.append(self.queues.get(label, "TRIAGE"))
+        return pd.DataFrame({"queue_id": queue_ids})
+```
+
+A) Passar `artifacts={"queues": "/Volumes/main/support/config/queues.json"}` para `mlflow.pyfunc.log_model()` e abrir `context.artifacts["queues"]` em `load_context`  
+B) Declarar o arquivo JSON no argumento `resources` de `mlflow.pyfunc.log_model()` para que a implantação o provisione junto com o modelo  
+C) Mover a leitura do arquivo para `predict`, para que cada solicitação use o mapeamento mais recente do volume  
+D) Colocar o mapeamento dentro do `input_example` passado a `mlflow.pyfunc.log_model()`, porque o exemplo de entrada é salvo com o modelo  
+
+> [!success]- Resposta
+> **Resposta correta: A**
+>
+> Inclua o arquivo como artefato do modelo e carregue-o de `context.artifacts`.
+>
+> Do jeito que está, o mapeamento fica fora do modelo registrado, então o comportamento de uma versão depende do conteúdo do volume no momento em que o modelo é carregado, e não do que foi avaliado. Os arquivos passados em `artifacts` são baixados para o diretório do modelo quando ele é registrado com `log_model()`, e `context.artifacts["queues"]` fornece o caminho local dessa cópia; carregá-lo em `load_context` mantém essa etapa única, enquanto `redact()` e a consulta ficam em `predict` porque dependem de cada solicitação. `resources` declara recursos da Databricks, como endpoints de serving e índices Vector Search, para que a implantação provisione o acesso; não empacota arquivos. Ler o volume em `predict` faz o oposto do requisito e acrescenta leitura de arquivo a cada solicitação, e um exemplo de entrada é uma solicitação de amostra, não uma configuração que `predict` possa ler.
 
 ---
 

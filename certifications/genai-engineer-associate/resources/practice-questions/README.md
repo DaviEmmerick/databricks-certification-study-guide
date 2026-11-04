@@ -13,11 +13,11 @@ Topic-specific questions. Files 01–04 predate the 6-section blueprint and are 
 |---|---|---|---|
 | [01-rag-architecture.md](./01-rag-architecture.md) | RAG Architecture | 15 | Design Applications, Data Preparation |
 | [02-vector-search-embeddings.md](./02-vector-search-embeddings.md) | Vector Search & Embeddings | 12 | Data Preparation, Assembling and Deploying Applications |
-| [03-llm-application-development.md](./03-llm-application-development.md) | LLM Application Development | 14 | Application Development |
+| [03-llm-application-development.md](./03-llm-application-development.md) | LLM Application Development, chunking from evaluation results | 16 | Application Development |
 | [04-databricks-genai-tools.md](./04-databricks-genai-tools.md) | Databricks GenAI Tools | 7 | Assembling and Deploying Applications, Evaluation and Monitoring |
 | [05-design-and-data-preparation.md](./05-design-and-data-preparation.md) | Agent Bricks, task selection, tool ordering, extraction, retrieval metrics *(2026 guide)* | 12 | Design Applications, Data Preparation |
-| [06-agents-mcp-and-deployment.md](./06-agents-mcp-and-deployment.md) | `ResponsesAgent`, Genie, MCP, access control, `ai_query()`, memory, prompts, UIs *(2026 guide)* | 13 | Application Development, Assembling and Deploying Applications |
-| [07-evaluation-monitoring-and-governance.md](./07-evaluation-monitoring-and-governance.md) | Judges, custom scorers, SME feedback, Agent Monitoring, AI Gateway, masking, guardrails, licensing *(2026 guide)* | 12 | Evaluation and Monitoring, Governance |
+| [06-agents-mcp-and-deployment.md](./06-agents-mcp-and-deployment.md) | `ResponsesAgent`, Genie, MCP, access control, `ai_query()`, memory, prompts, UIs, pyfunc pre- and post-processing *(2026 guide)* | 15 | Application Development, Assembling and Deploying Applications |
+| [07-evaluation-monitoring-and-governance.md](./07-evaluation-monitoring-and-governance.md) | Judges, custom scorers, SME feedback, Agent Monitoring, inference logging, model size and architecture, AI Gateway, masking, guardrails, licensing, problematic source text *(2026 guide)* | 18 | Evaluation and Monitoring, Governance |
 
 ## Study Tips
 

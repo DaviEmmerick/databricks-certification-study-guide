@@ -7,7 +7,7 @@ status: published
 
 # Practice Questions — LLM Application Development
 
-14 questions covering prompt engineering, LangChain chains and agents, conversation memory, and MLflow LLM tracking.
+16 questions covering prompt engineering, LangChain chains and agents, conversation memory, MLflow LLM tracking, and choosing a chunking strategy from evaluation results.
 
 [← Vector Search & Embeddings](./02-vector-search-embeddings.md) | [Next: Databricks GenAI Tools →](./04-databricks-genai-tools.md)
 
@@ -234,6 +234,55 @@ D) Fine-tune the LLM to never mention investment topics
 > **Correct Answer: A**
 >
 > Output guardrails use a classifier (often a separate LLM or rule-based system) to detect and block responses that violate policy — such as specific investment advice. This is the standard production-grade approach for content safety in regulated industries. Temperature=0 affects randomness, not content policy. Reducing max_tokens limits length, not specific content types. Fine-tuning could reduce the frequency of policy violations but cannot guarantee elimination.
+
+---
+
+## Question 15 *(Medium)*: Choosing a Chunk Size From Evaluation Results *(2026 guide)*
+
+**Question**: A team building a RAG assistant over HR policies runs a chunk-size sweep. Every run uses the same embedding model (`databricks-gte-large-en`), `k = 5`, the same LLM, and the same 150 evaluation questions with expected facts, scored with `mlflow.genai.evaluate()`. The requirement is to maximise the share of answers that contain all expected facts while keeping P95 latency under 3 seconds. Which option should the team adopt?
+
+```text
+Chunk size / overlap   RetrievalSufficiency   Correctness   Avg prompt tokens   P95 latency
+256 / 25               0.64                   0.66          1600                1.4 s
+512 / 50               0.86                   0.84          2900                1.9 s
+1024 / 100             0.88                   0.85          5600                3.6 s
+```
+
+A) 256 / 25, because the smallest chunks give the lowest latency and token cost  
+B) 1024 / 100, because it has the highest RetrievalSufficiency and Correctness  
+C) 512 / 50, because it is within a few points of the best quality and meets the latency target  
+D) 1024 / 100 with `k` lowered from 5 to 3, so that its prompt shrinks enough to meet the latency target  
+
+> [!success]- Answer
+> **Correct Answer: C**
+>
+> 512 / 50: near-best quality inside the latency target.
+>
+> Treat chunking as a hyperparameter: drop every configuration that breaks the hard requirement, then pick the best of the rest on the primary metric. 1024 / 100 scores highest but misses the 3-second P95 target, so it is out. 256 / 25 is fastest but loses more than 20 points of RetrievalSufficiency, so needed facts are often not retrieved. Lowering `k` creates a new configuration that nobody has evaluated and that may drop the very facts that made the large chunks score well, while 512 / 50 already meets both requirements on measured results.
+
+---
+
+## Question 16 *(Hard)*: Changing Chunking After Conflicting Retrieval Scores *(2026 guide)*
+
+**Question**: A RAG assistant answers questions about equipment maintenance; each procedure is a 600–900-token section under its own heading. The team evaluates two chunking configurations on the same 200 questions with expected facts, using `RetrievalRelevance`, `RetrievalSufficiency`, and `Correctness`. Retrieved context must stay under 3,000 tokens per request. Reviewers report that with small chunks the top chunk is usually the right procedure, but the answer misses later steps, which rarely repeat the equipment or task name and so rank below the opening steps of similar procedures. Which change is most likely to raise RetrievalSufficiency while keeping the precise matching of small chunks and staying within the token budget?
+
+```text
+Config                        RetrievalRelevance   RetrievalSufficiency   Correctness   Context tokens/request
+S: 200-token chunks, k = 5    0.88                 0.52                   0.55          ~1000
+L: 1024-token chunks, k = 5   0.47                 0.83                   0.80          ~5100
+```
+
+A) Keep config S and raise `k` from 5 to 20 so that more of each procedure's chunks are retrieved  
+B) Index the 200-token chunks as children and send the LLM the parent section of the top 3 distinct procedures  
+C) Keep config L and add a re-ranker so that the most relevant 1024-token chunks are ranked first  
+D) Keep config S and raise the chunk overlap from 20 to 100 tokens so that steps at chunk boundaries stay together  
+
+> [!success]- Answer
+> **Correct Answer: B**
+>
+> Parent-child chunking: retrieve on the small chunks, return the parent section.
+>
+> The scores split the problem in two: small chunks find the right procedure (high relevance), but a 200-token chunk cannot hold a 600–900-token procedure, so sufficiency and correctness drop. Retrieving on child chunks keeps that precise matching, and returning each match's parent section supplies the missing steps; three sections of at most 900 tokens stay under the 3,000-token budget. Raising `k` to 20 pulls about 4,000 tokens, over the budget, and nothing ensures the extra results are the missing steps rather than more opening steps of similar procedures. A re-ranker only reorders the large chunks, which still mix procedures and still exceed the budget at `k = 5`. More overlap only repeats boundary sentences; each chunk is still far smaller than a procedure.
 
 ---
 
