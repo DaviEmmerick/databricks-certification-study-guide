@@ -2,7 +2,7 @@
   "cert": "genai-engineer-associate-mock-1",
   "certTitle": "GenAI Engineer Associate — Mock Exam 1",
   "blueprintVersion": "Mar 18, 2026",
-  "generated": "2026-10-26",
+  "generated": "2026-11-04",
   "domains": [
     {
       "id": "design-rag-solutions",
@@ -741,10 +741,10 @@
       "difficulty": "hard",
       "question": "A team uses `mlflow.evaluate()` to score their RAG chain and gets these results: `faithfulness=0.85`, `answer_relevance=0.90`, `toxicity=0.02`. Which conclusion is MOST accurate?",
       "choices": {
-        "A": "Sample N recent rows from the Inference Table into a Spark DataFrame; run `mlflow.evaluate(data=sample, model_type=\"databricks-agent\")` so the built-in Databricks RAG judges (groundedness, relevance, correctness, safety) score the sample; schedule via a Lakeflow Job",
-        "B": "Manually read 100 random conversations every week",
-        "C": "Compute a groundedness score with a regex over the response text",
-        "D": "Train a custom classifier on production data"
+        "A": "The pipeline is underperforming — all three metrics should be above 0.95 for production use",
+        "B": "The pipeline generates answers that are mostly grounded in retrieved context, relevant to user questions, and rarely produces harmful content — a reasonable production baseline",
+        "C": "The toxicity score of 0.02 indicates that 2% of answers are toxic and must be fixed before deployment",
+        "D": "The faithfulness score of 0.85 indicates the retrieval step is failing 15% of the time"
       },
       "correctAnswer": "B",
       "shortAnswer": "Faithfulness=0.85 is strong (85% of claims are grounded in context). Answer relevance=0.90 is excellent (answers address the user's question 90% of the time). Toxicity=0.02 is very low (2% frequency, which may refer to low scores, not that 2% are harmful). Together these indicate a well-performing pipeline. Production readiness thresholds are domain-specific — there are no universal 0.95 requirements. Faithfulness is a generation metric, not a retrieval metric.",

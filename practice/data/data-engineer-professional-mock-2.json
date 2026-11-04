@@ -2,7 +2,7 @@
   "cert": "data-engineer-professional-mock-2",
   "certTitle": "Data Engineer Professional — Mock Exam 2",
   "blueprintVersion": "Oct 9, 2026",
-  "generated": "2026-10-26",
+  "generated": "2026-11-04",
   "domains": [
     {
       "id": "data-ingestion-acquisition",
@@ -1011,10 +1011,10 @@
       "difficulty": "medium",
       "question": "How does `OPTIMIZE` behave differently after the table has been converted to liquid clustering?",
       "choices": {
-        "A": "Configure Lakeflow Jobs notifications (email + webhook to PagerDuty) for failures AND query `system.lakeflow.job_run_timeline` for historical failure analytics",
-        "B": "Add a Slack webhook inside the job's last task that fires on success; absence of message indicates failure",
-        "C": "Set up a SQL Alert that polls `SHOW JOBS` every 5 minutes",
-        "D": "Rely on Databricks support to surface failures automatically"
+        "A": "OPTIMIZE no longer performs any file compaction; it only updates clustering metadata in the Delta log",
+        "B": "OPTIMIZE applies Z-ORDER clustering automatically using the columns defined in the CLUSTER BY clause, with no behavioral change to the compaction process",
+        "C": "OPTIMIZE rewrites all data files on every run to ensure complete clustering, which increases write amplification compared to Z-ORDER",
+        "D": "OPTIMIZE incrementally clusters only the files that need reorganization, avoiding full rewrites and enabling more efficient partial clustering over time"
       },
       "correctAnswer": "D",
       "shortAnswer": "With liquid clustering, `OPTIMIZE` uses an incremental approach that identifies and rewrites only the files that would benefit from better clustering, rather than rewriting the entire table or requiring a full sort. This is a key behavioral difference from Z-ORDER, which rewrites all files in the targeted partitions on each OPTIMIZE run. The incremental strategy reduces write amplification and makes it practical to run OPTIMIZE more frequently without excessive I/O cost.",

@@ -106,6 +106,12 @@ def parse_questions(md_path: Path, domain_id: str) -> list[dict]:
     for i in range(1, len(blocks), 2):
         heading = blocks[i].strip()
         body = blocks[i + 1] if i + 1 < len(blocks) else ""
+        # A question ends at the next heading of any level. Without this, a
+        # block that follows the last numbered question — e.g. the
+        # `### Question GOV-1` items under "Supplementary questions (not in the
+        # timed set)" — is absorbed into it, and its A–D lines overwrite the
+        # real choices while the original correct-answer letter is kept.
+        body = re.split(r"^#{1,6} ", body, maxsplit=1, flags=re.MULTILINE)[0]
 
         qnum, title, heading_difficulty = parse_heading(heading)
         if qnum is None:
