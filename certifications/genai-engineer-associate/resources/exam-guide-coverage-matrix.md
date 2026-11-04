@@ -11,7 +11,7 @@ Which practice and mock-exam questions test each of the 56 bullets in the [offic
 
 ## How to use it
 
-1. Take a timed diagnostic first: [Mock Exam 1](./mock-exam/README.md) plus practice sets [05–07](./practice-questions/README.md), which cover the 2026 bullets the mocks miss.
+1. Take a timed diagnostic first: [Mock Exam 1](./mock-exam/README.md) plus practice sets [05–07](./practice-questions/README.md) and Q15–16 of set 03, which cover the 2026 bullets the mocks miss.
 2. Count a lucky guess as wrong. For each wrong question, find its bullet below.
 3. Open the domain folder's `README.md` → **Exam Guide Coverage** table to get the exact chapter section for that bullet. Read that section in full; for bullets you got right, read only the chapter's *Exam Tips* and *Key Takeaways*.
 4. Hold back [Mock Exam 2](./mock-exam-2/README.md) as the final check.

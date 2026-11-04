@@ -11,7 +11,7 @@ Quais questões de prática e de simulado testam cada um dos 56 itens do [guia o
 
 ## Como usar
 
-1. Faça primeiro um diagnóstico cronometrado: o [Simulado 1](./mock-exam/README.md) e as listas de prática [05–07](./practice-questions/README.md), que cobrem os itens de 2026 que os simulados não testam.
+1. Faça primeiro um diagnóstico cronometrado: o [Simulado 1](./mock-exam/README.md) e as listas de prática [05–07](./practice-questions/README.md) e as Q15–16 da lista 03, que cobrem os itens de 2026 que os simulados não testam.
 2. Conte chute certo como erro. Para cada questão errada, encontre o item abaixo.
 3. Abra o `README.md` da pasta do domínio → tabela **Cobertura do guia do exame** para achar a seção exata do capítulo. Leia essa seção inteira; nos itens que você acertou, leia só as *Exam Tips* e os *Key Takeaways* do capítulo.
 4. Guarde o [Simulado 2](./mock-exam-2/README.md) para a verificação final.
