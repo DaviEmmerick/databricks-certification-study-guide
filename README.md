@@ -51,7 +51,7 @@ tags:
 > **▶ [Try the practice quiz live](https://kengio.github.io/databricks-certification-study-guide/)** — adaptive multiple-choice quiz, **1,337 questions across 18 banks** (6 practice + 12 mock exams, all 6 cert tracks). Runs in your browser, progress saved locally. No install, no signup. Exam timer with pause / resume, completion summary with per-module breakdown + weak-area highlight, attempt history, HTML / CSV export, keyboard-first navigation, light / dark / auto theme, WCAG AAA contrast.
 
 > [!info]
-> **Read in another language**: 🇹🇭 [ภาษาไทย](./i18n/th/README.md) (in progress) · For other languages and the translation policy, see [`TRANSLATING.md`](./TRANSLATING.md) and [`i18n/README.md`](./i18n/README.md).
+> **Read in another language**: 🇧🇷 [Português brasileiro](./genai-engineer-associate-ptbr/pt-br/README.md) · 🇹🇭 [ภาษาไทย](./genai-engineer-associate-ptbr/th/README.md) (in progress) · For the translation index and policy, see [`genai-engineer-associate-ptbr/README.md`](./genai-engineer-associate-ptbr/README.md) and [`TRANSLATING.md`](./TRANSLATING.md).
 
 ---
 
@@ -441,7 +441,7 @@ This guide ships as a living resource. The roadmap below is what's planned for t
 ### Q1 2027 (6–12 months out)
 
 - ✅ **Renewal guide** for candidates whose 2-year validity expires in 2027–2028 — complete (see [`shared/appendix/renewal-guide.md`](./shared/appendix/renewal-guide.md))
-- ✅ **Translation scaffolding** — Thai in-tree, other languages via fork model — complete (see [`TRANSLATING.md`](./TRANSLATING.md) + [`i18n/`](./i18n/README.md))
+- ✅ **Translation scaffolding** — Thai in-tree, other languages via fork model — complete (see [`TRANSLATING.md`](./TRANSLATING.md) + [`genai-engineer-associate-ptbr/`](./genai-engineer-associate-ptbr/README.md))
 - ✅ **Spaced-repetition deck (Anki)** — markdown-source decks + stdlib-only builder, two starter decks (Delta Lake 27 cards, Unity Catalog 22 cards) — complete (see [`anki/README.md`](./anki/README.md))
 - ✅ **Adaptive practice questions** — static-only web quiz with localStorage progress tracking + adaptive selector. **18 banks / 1,337 questions** (6 practice topic banks + 12 mock exams, all 6 cert tracks). **Live at [kengio.github.io/databricks-certification-study-guide](https://kengio.github.io/databricks-certification-study-guide/)** — complete (see [`practice/README.md`](./practice/README.md))
 
@@ -466,7 +466,7 @@ databricks-certification-study-guide/
 │   └── interview-prep/                  # 15 topic files, 108 open-ended design questions
 ├── learning-paths/                      # role-based progression guides
 ├── labs/                                # runnable hands-on lab pack (5 labs)
-├── i18n/                                # translations index + th/ (Thai in-tree translation)
+├── genai-engineer-associate-ptbr/       # translation index + PT-BR GenAI study translation + Thai translation
 ├── anki/                                # spaced-repetition decks (markdown source + stdlib builder)
 ├── practice/                            # static adaptive practice quiz (HTML/CSS/JS + JSON banks)
 ├── images/databricks-ui/                # screenshots organised by feature area
