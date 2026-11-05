@@ -7,7 +7,7 @@ status: published
 
 # Questões de prática — Desenvolvimento de aplicações com LLMs
 
-14 questões sobre engenharia de prompts, chains e agentes do LangChain, memória de conversação e rastreamento de LLMs com MLflow.
+16 questões sobre engenharia de prompts, chains e agentes do LangChain, memória de conversação, rastreamento de LLMs com MLflow e escolha da estratégia de chunking a partir dos resultados da avaliação.
 
 [← Vector Search e embeddings](./02-vector-search-embeddings.md) | [Próximo: Ferramentas GenAI da Databricks →](./04-databricks-genai-tools.md)
 
@@ -234,6 +234,55 @@ D) Fazer fine-tuning do LLM para que nunca mencione assuntos de investimento
 > **Resposta correta: A**
 >
 > Guardrails de saída usam um classificador (geralmente um LLM separado ou um sistema baseado em regras) para detectar e bloquear respostas que violam políticas — como recomendações específicas de investimento. Essa é a abordagem padrão, pronta para produção, para segurança de conteúdo em setores regulados. Temperature=0 afeta a aleatoriedade, não a política de conteúdo. Reduzir max_tokens limita o tamanho, não categorias específicas de conteúdo. Fine-tuning poderia reduzir a frequência de violações, mas não garantiria sua eliminação.
+
+---
+
+## Questão 15 *(Média)*: Escolher o tamanho do chunk a partir dos resultados da avaliação *(guia de 2026)*
+
+**Questão**: Uma equipe que está criando um assistente RAG sobre políticas de RH testa vários tamanhos de chunk. Todas as execuções usam o mesmo modelo de embeddings (`databricks-gte-large-en`), `k = 5`, o mesmo LLM e as mesmas 150 perguntas de avaliação com fatos esperados, pontuadas com `mlflow.genai.evaluate()`. O requisito é maximizar a parcela de respostas que contêm todos os fatos esperados, mantendo a latência P95 abaixo de 3 segundos. Qual opção a equipe deve adotar?
+
+```text
+Chunk / sobreposição   RetrievalSufficiency   Correctness   Tokens médios no prompt   Latência P95
+256 / 25               0,64                   0,66          1600                      1,4 s
+512 / 50               0,86                   0,84          2900                      1,9 s
+1024 / 100             0,88                   0,85          5600                      3,6 s
+```
+
+A) 256 / 25, porque os chunks menores têm a menor latência e o menor custo em tokens  
+B) 1024 / 100, porque tem os maiores valores de RetrievalSufficiency e Correctness  
+C) 512 / 50, porque fica a poucos pontos da melhor qualidade e cumpre a meta de latência  
+D) 1024 / 100 com `k` reduzido de 5 para 3, para que o prompt encolha o suficiente e cumpra a meta de latência  
+
+> [!success]- Resposta
+> **Resposta correta: C**
+>
+> 512 / 50: qualidade quase máxima dentro da meta de latência.
+>
+> Trate o chunking como um hiperparâmetro: descarte toda configuração que viole o requisito obrigatório e, entre as restantes, escolha a melhor na métrica principal. 1024 / 100 tem a maior pontuação, mas não cumpre a meta de P95 de 3 segundos, por isso fica de fora. 256 / 25 é a mais rápida, mas perde mais de 20 pontos de RetrievalSufficiency, ou seja, fatos necessários muitas vezes não são recuperados. Reduzir `k` cria uma configuração nova, que ninguém avaliou e que pode perder justamente os fatos que garantiram a boa pontuação dos chunks grandes, enquanto 512 / 50 já cumpre os dois requisitos com resultados medidos.
+
+---
+
+## Questão 16 *(Difícil)*: Mudar o chunking diante de pontuações de recuperação conflitantes *(guia de 2026)*
+
+**Questão**: Um assistente RAG responde a perguntas sobre manutenção de equipamentos; cada procedimento é uma seção de 600 a 900 tokens com título próprio. A equipe avalia duas configurações de chunking nas mesmas 200 perguntas com fatos esperados, usando `RetrievalRelevance`, `RetrievalSufficiency` e `Correctness`. O contexto recuperado precisa ficar abaixo de 3.000 tokens por solicitação. Os revisores relatam que, com chunks pequenos, o primeiro chunk geralmente é do procedimento certo, mas a resposta omite as etapas seguintes, que raramente repetem o nome do equipamento ou da tarefa e, por isso, ficam abaixo das etapas iniciais de procedimentos parecidos no ranking. Qual mudança tem mais chance de aumentar RetrievalSufficiency, mantendo a correspondência precisa dos chunks pequenos e respeitando o limite de tokens?
+
+```text
+Configuração                      RetrievalRelevance   RetrievalSufficiency   Correctness   Tokens de contexto/solicitação
+S: chunks de 200 tokens, k = 5    0,88                 0,52                   0,55          ~1000
+L: chunks de 1024 tokens, k = 5   0,47                 0,83                   0,80          ~5100
+```
+
+A) Manter a configuração S e aumentar `k` de 5 para 20, para que mais chunks de cada procedimento sejam recuperados  
+B) Indexar os chunks de 200 tokens como filhos e enviar ao LLM a seção pai dos 3 principais procedimentos distintos  
+C) Manter a configuração L e adicionar um reranker, para que os chunks de 1024 tokens mais relevantes fiquem em primeiro lugar  
+D) Manter a configuração S e aumentar a sobreposição dos chunks de 20 para 100 tokens, para que as etapas nas fronteiras dos chunks fiquem juntas  
+
+> [!success]- Resposta
+> **Resposta correta: B**
+>
+> Chunking pai-filho: recupere pelos chunks pequenos e retorne a seção pai.
+>
+> As pontuações dividem o problema em dois: os chunks pequenos encontram o procedimento certo (relevância alta), mas um chunk de 200 tokens não comporta um procedimento de 600 a 900 tokens, por isso a suficiência e a correção caem. Recuperar pelos chunks filhos preserva essa correspondência precisa, e retornar a seção pai de cada correspondência traz as etapas que faltavam; três seções de no máximo 900 tokens ficam abaixo do limite de 3.000 tokens. Aumentar `k` para 20 traz cerca de 4.000 tokens, acima do limite, e nada garante que os resultados extras sejam as etapas que faltam, e não mais etapas iniciais de procedimentos parecidos. Um reranker apenas reordena os chunks grandes, que continuam misturando procedimentos e continuam acima do limite com `k = 5`. Mais sobreposição apenas repete as frases da fronteira; cada chunk continua muito menor que um procedimento.
 
 ---
 

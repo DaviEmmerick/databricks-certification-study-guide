@@ -93,6 +93,7 @@ Cada `README.md` da pasta tem uma tabela de **Cobertura do Guia do Exame** que m
 | [Dicas de exame](../../../../certifications/genai-engineer-associate/resources/exam-tips.md) | Estratégias e dicas para o exame |
 | [Revisão final](../../../../certifications/genai-engineer-associate/resources/final-review.md) | Escaneamento de revisão final antes do exame |
 | [Links oficiais](../../../../certifications/genai-engineer-associate/resources/official-links.md) | Documentação e recursos |
+| [Matriz de cobertura do guia do exame](./resources/exam-guide-coverage-matrix.md) | Quais questões testam cada um dos 56 itens do guia do exame |
 
 ## Preparação para entrevista
 

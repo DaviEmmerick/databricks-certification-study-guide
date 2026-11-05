@@ -2,7 +2,7 @@
   "cert": "genai-engineer-associate-mock-2",
   "certTitle": "GenAI Engineer Associate — Mock Exam 2",
   "blueprintVersion": "Mar 18, 2026",
-  "generated": "2026-10-26",
+  "generated": "2026-11-04",
   "domains": [
     {
       "id": "design-rag-solutions",
@@ -741,10 +741,10 @@
       "difficulty": "hard",
       "question": "A team is deciding between MLflow AI Gateway and direct Foundation Model API calls for their multi-team organization. Which scenario makes MLflow AI Gateway the CLEARLY better choice?",
       "choices": {
-        "A": "Sample N recent rows from the Inference Table into a Spark DataFrame; run `mlflow.evaluate(data=sample, model_type=\"databricks-agent\")` so the built-in Databricks RAG judges (groundedness, relevance, correctness, safety) score the sample; schedule via a Lakeflow Job",
-        "B": "Manually read 100 random conversations every week",
-        "C": "Compute a groundedness score with a regex over the response text",
-        "D": "Train a custom classifier on production data"
+        "A": "A single data scientist prototyping a RAG pipeline in a notebook",
+        "B": "An organization with 10 teams, multiple LLM providers, centralized credential management requirements, and per-team rate limit policies",
+        "C": "A batch inference job that runs once per day on a fixed dataset",
+        "D": "A developer who needs the absolute lowest latency for a single high-traffic endpoint"
       },
       "correctAnswer": "B",
       "shortAnswer": "MLflow AI Gateway adds the most value in multi-team, multi-provider scenarios where centralized credential management, unified API abstraction, and per-team rate limiting are needed. A single data scientist in a notebook has no need for the gateway's organizational features. Batch jobs benefit from direct API calls (no gateway overhead). The gateway adds a network hop that increases latency — direct API calls are faster for single-endpoint, latency-critical applications.",

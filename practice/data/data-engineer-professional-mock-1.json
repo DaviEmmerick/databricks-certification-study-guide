@@ -2,7 +2,7 @@
   "cert": "data-engineer-professional-mock-1",
   "certTitle": "Data Engineer Professional — Mock Exam 1",
   "blueprintVersion": "Oct 9, 2026",
-  "generated": "2026-10-26",
+  "generated": "2026-11-04",
   "domains": [
     {
       "id": "data-ingestion-acquisition",
@@ -1059,10 +1059,10 @@
       "difficulty": "medium",
       "question": "Which configuration change most likely resolves this issue?",
       "choices": {
-        "A": "Configure Lakeflow Jobs notifications (email + webhook to PagerDuty) for failures AND query `system.lakeflow.job_run_timeline` for historical failure analytics",
-        "B": "Add a Slack webhook inside the job's last task that fires on success; absence of message indicates failure",
-        "C": "Set up a SQL Alert that polls `SHOW JOBS` every 5 minutes",
-        "D": "Rely on Databricks support to surface failures automatically"
+        "A": "Increase `spark.sql.shuffle.partitions` to create smaller partitions",
+        "B": "Decrease `spark.memory.fraction` to leave more room for user objects",
+        "C": "Enable `spark.sql.adaptive.enabled` for dynamic partition coalescing",
+        "D": "Set `spark.executor.memoryOverhead` to 0 for maximum heap space"
       },
       "correctAnswer": "A",
       "shortAnswer": "OOM during shuffle typically means individual partitions are too large. Increasing shuffle partitions creates smaller partitions that fit in memory. Option B reduces available memory. Option C helps with small partitions, not OOM. Option D can cause off-heap OOM errors.",

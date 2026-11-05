@@ -13,11 +13,11 @@ Questões específicas por tópico. Os arquivos 01–04 antecedem o blueprint de
 |---|---|---|---|
 | [01-rag-architecture.md](./01-rag-architecture.md) | Arquitetura RAG | 15 | Design Applications, Data Preparation |
 | [02-vector-search-embeddings.md](./02-vector-search-embeddings.md) | Vector Search e embeddings | 12 | Data Preparation, Assembling and Deploying Applications |
-| [03-llm-application-development.md](./03-llm-application-development.md) | Desenvolvimento de aplicações com LLMs | 14 | Application Development |
+| [03-llm-application-development.md](./03-llm-application-development.md) | Desenvolvimento de aplicações com LLMs, chunking a partir da avaliação | 16 | Application Development |
 | [04-databricks-genai-tools.md](./04-databricks-genai-tools.md) | Ferramentas GenAI da Databricks | 7 | Assembling and Deploying Applications, Evaluation and Monitoring |
 | [05-design-and-data-preparation.md](./05-design-and-data-preparation.md) | Agent Bricks, seleção de tarefas, ordem das ferramentas, extração, métricas de recuperação *(guia de 2026)* | 12 | Design Applications, Data Preparation |
-| [06-agents-mcp-and-deployment.md](./06-agents-mcp-and-deployment.md) | `ResponsesAgent`, Genie, MCP, controle de acesso, `ai_query()`, memória, prompts, interfaces *(guia de 2026)* | 13 | Application Development, Assembling and Deploying Applications |
-| [07-evaluation-monitoring-and-governance.md](./07-evaluation-monitoring-and-governance.md) | Juízes, scorers personalizados, feedback de especialistas, Agent Monitoring, AI Gateway, mascaramento, guardrails, licenciamento *(guia de 2026)* | 12 | Evaluation and Monitoring, Governance |
+| [06-agents-mcp-and-deployment.md](./06-agents-mcp-and-deployment.md) | `ResponsesAgent`, Genie, MCP, controle de acesso, `ai_query()`, memória, prompts, interfaces, pré e pós-processamento em pyfunc *(guia de 2026)* | 15 | Application Development, Assembling and Deploying Applications |
+| [07-evaluation-monitoring-and-governance.md](./07-evaluation-monitoring-and-governance.md) | Juízes, scorers personalizados, feedback de especialistas, Agent Monitoring, registro de inferências, tamanho e arquitetura de modelo, AI Gateway, mascaramento, guardrails, licenciamento, texto problemático na fonte *(guia de 2026)* | 18 | Evaluation and Monitoring, Governance |
 
 ## Dicas de estudo
 

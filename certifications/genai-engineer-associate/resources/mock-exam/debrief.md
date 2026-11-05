@@ -73,9 +73,9 @@ Heuristic mapping of every question in this mock to its primary domain + the top
 | 45 | Hard | Evaluation and Monitoring | [topic folder](../../05-evaluation-and-monitoring/README.md) | [cheat sheet](../../../../shared/cheat-sheets/mlflow-quick-ref.md) |
 | GOV-1 | Medium | Governance | [topic folder](../../06-governance/README.md) | [cheat sheet](../../../../shared/cheat-sheets/unity-catalog-quick-ref.md) |
 | GOV-2 | Medium | Governance | [topic folder](../../06-governance/README.md) | [cheat sheet](../../../../shared/cheat-sheets/unity-catalog-quick-ref.md) |
-| AGENT-1 | Medium | Governance | [topic folder](../../06-governance/README.md) | [cheat sheet](../../../../shared/cheat-sheets/unity-catalog-quick-ref.md) |
-| GW-1 | Medium | Governance | [topic folder](../../06-governance/README.md) | [cheat sheet](../../../../shared/cheat-sheets/unity-catalog-quick-ref.md) |
-| EVAL-1 | Medium | Governance | [topic folder](../../06-governance/README.md) | [cheat sheet](../../../../shared/cheat-sheets/unity-catalog-quick-ref.md) |
+| AGENT-1 | Medium | Assembling and Deploying Applications | [topic folder](../../02-assembling-and-deploying-apps/README.md) | [cheat sheet](../../../../shared/cheat-sheets/mlflow-quick-ref.md) |
+| GW-1 | Medium | Assembling and Deploying Applications | [topic folder](../../02-assembling-and-deploying-apps/README.md) | [cheat sheet](../../../../shared/cheat-sheets/mlflow-quick-ref.md) |
+| EVAL-1 | Medium | Evaluation and Monitoring | [topic folder](../../05-evaluation-and-monitoring/README.md) | [cheat sheet](../../../../shared/cheat-sheets/mlflow-quick-ref.md) |
 
 ## Per-section question map
 

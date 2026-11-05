@@ -755,101 +755,97 @@ D) A developer who needs the absolute lowest latency for a single high-traffic e
 
 ---
 
-## New questions for the March 2026 blueprint refresh
+## Supplementary questions (not in the timed set)
 
-The questions below cover the newly elevated **Governance** domain (8 %).
+These five questions are not part of the timed 45. Each one targets an exam-guide bullet that has only one other question in this guide's question banks.
 
-### Question GOV-1 *(Medium — Governance)*
+### Question DATA-1 *(Hard — Data Preparation)*
 
-**Scenario**: A team is preparing to deploy a RAG application that retrieves from a vector index built over a Delta table containing customer support tickets. The tickets include customer email addresses and account numbers. The compliance team requires that PII never appear in retrieved chunks shown to users.
+**Scenario**: A nightly job re-parses every policy document that changed during the day, re-chunks it, assigns each chunk `chunk_id = uuid4()`, and appends the chunks to `main.kb.policy_chunks`. That Unity Catalog Delta table has Change Data Feed enabled and feeds a triggered Delta Sync index (primary key `chunk_id`) on a standard endpoint. After a month, retrieval returns both the superseded and the current wording of the same policy sections. Only a handful of the 40,000 documents change each night, and the team wants each sync to process only what changed.
 
-**Question**: Where in the pipeline should PII redaction happen?
+**Question**: Which change to the write step fixes the stale results while meeting that constraint?
 
-A) At retrieval time — apply a UC column mask to the embedding column to hide the vector when PII was detected  
-B) After generation — post-process the LLM output with a regex to strip PII before returning to the user  
-C) At chunk / embed time — redact PII *before* the chunks are embedded, so the vector index never contains reconstructible PII  
-D) At the Unity AI Gateway layer — enable the "PII detection" policy on the serving endpoint  
+A) Keep the `uuid4()` IDs and the append, but switch the index from TRIGGERED to CONTINUOUS so each new chunk reaches the index within seconds  
+B) Re-chunk all 40,000 documents every night and write them with `mode("overwrite")`, so the table holds only current chunks before the sync  
+C) Make `chunk_id` deterministic (from `document_id` + chunk position) and `MERGE` each changed document's chunks on it, deleting that document's leftover chunks, then trigger the sync  
+D) Keep the table as it is and push each changed document's new chunks straight into the index with the Vector Search `upsert` API  
 
 > [!success]- Answer
 > **Correct Answer: C**
 >
-> PII must be redacted **before embedding**. Once a PII string is embedded into a vector, that vector lives in the index — and embeddings preserve enough information that the original content can sometimes be reconstructed. UC column masks (A) work for SQL access but not for the vector representation. Post-generation regex (B) is brittle and lossy. Unity AI Gateway PII guardrails (D) are a useful defence-in-depth perimeter but do not address PII *inside the index itself*; the safe pattern is to redact at chunk time AND apply gateway / output filters on top.
+> The stale rows live in the source table. Random UUIDs mean a revised chunk never matches its earlier row, so every run only adds rows, and the Delta Sync index faithfully mirrors both versions. A stable `chunk_id` plus `MERGE` turns each revision into updates, inserts, and deletes that Change Data Feed records, so the next sync on a standard endpoint processes only those rows. CONTINUOUS (A) changes when the sync runs, not what is in the table, so the duplicates stay. Overwrite (B) removes the duplicates but replaces every row, so the sync re-embeds the whole corpus instead of a handful of documents. The `upsert` API (D) writes to Direct Vector Access indexes; a Delta Sync index takes its rows from the source table, where the stale chunks would still be.
 
 ---
 
-### Question GOV-2 *(Medium — Governance)*
+### Question APPDEV-1 *(Medium — Application Development)*
 
-**Scenario**: A team has a Model Serving endpoint hosting a customer-facing GenAI app. The security and compliance team needs an audit trail: every prompt and every response, with timestamps and request IDs, retained for at least 90 days and queryable from SQL.
+**Scenario**: A team must pick an LLM to turn long support-call transcripts into a three-sentence summary. Each transcript in their versioned evaluation dataset has a human-written reference summary, and the three candidates cost about the same per request. The MLflow experiment holds one run per candidate. Model A, evaluated on dataset v3 (500 transcripts): ROUGE-L 0.41, BLEU 0.24, exact match 0.02. Model B, evaluated on dataset v3: ROUGE-L 0.47, BLEU 0.19, exact match 0.01. Model C, evaluated on dataset v2 (200 shorter, simpler transcripts): ROUGE-L 0.55, BLEU 0.27, exact match 0.04.
 
-**Question**: Which Databricks capability satisfies this requirement with the least custom code?
+**Question**: Based on these runs, which model should the team select?
 
-A) Add a logging callback inside the LLM chain that writes each request/response to a Delta table  
-B) Enable **Inference Tables** on the Model Serving endpoint — Databricks auto-captures `request`, `response`, `timestamp_ms`, and `databricks_request_id` into a Delta table in UC  
-C) Stream the endpoint's stderr to a CloudWatch / Cloud Logging sink and parse logs nightly  
-D) Configure a Unity AI Gateway "audit" policy that emails a daily digest to the compliance team  
+A) Model C, because it has the highest ROUGE-L and BLEU scores of the three runs  
+B) Model B, because it has the highest ROUGE-L of the runs evaluated on the same dataset, and ROUGE is the metric that fits summarisation  
+C) Model A, because it has the highest BLEU of the runs on dataset v3, and BLEU is the standard metric for summary quality  
+D) Model A, because exact match is the most objective of the three metrics and Model A beats Model B on it  
 
 > [!success]- Answer
 > **Correct Answer: B**
 >
-> Inference Tables are the documented audit-of-record for Model Serving endpoints. Enabling them auto-captures every request/response into a Delta table in UC. The exact schema depends on the endpoint type: **Model Serving inference tables** use `request`, `response`, `timestamp_ms`, `databricks_request_id`; **AI Gateway inference tables** (the unified schema for Gateway-wrapped endpoints) use `request_time` and a slightly different layout — both give you the same audit guarantee. giving you SQL-queryable retention out of the box. Option A is the "build it yourself" version and is unnecessary. Option C is brittle and out-of-band. Option D is not how Unity AI Gateway works. The Gateway's logging *policy* auto-routes into Inference Tables (which is exactly the correct answer here, framed differently); there is no built-in email-digest feature.
+> Two checks decide it. First, only runs on the same evaluation dataset are comparable: Model C's scores come from an easier 200-row subset, so they say nothing about how it does on v3; re-run it on v3 before considering it. Second, use the metric that fits the task: ROUGE measures overlap with a reference summary and is the classic summarisation metric, BLEU was designed for translation, and exact match suits short factual answers, because a generated summary almost never matches its reference word for word. On v3, Model B leads on ROUGE-L, so it is the pick.
 
 ---
 
-### Question AGENT-1 *(Medium — Assembling and Deploying Apps)*
+### Question APPDEV-2 *(Hard — Application Development)*
 
-**Scenario**: A team has built a RAG chain in LangChain. They need to deploy it as a single Model Serving endpoint with streaming responses, MLflow tracing, and automatic Inference Table capture.
+**Scenario**: A support agent passed pre-release evaluation: `mlflow.genai.evaluate()` on a 400-row curated evaluation dataset scored 0.92 on `RelevanceToQuery` and `RetrievalGroundedness`, which met the release gate. Three weeks after launch, production monitoring (the same two scorers, registered on the experiment with `sample_rate=0.2`) shows both pass rates down to about 0.75. The failures are concentrated in traces about a product line launched after the dataset was built. Re-running the offline evaluation still gives 0.92.
 
-**Question**: Which deployment path is the documented best fit?
+**Question**: What does the gap between the two phases indicate, and what is the right next step?
 
-A) Subclass `mlflow.pyfunc.ResponsesAgent`, wrap the chain inside `predict()`, log via `mlflow.pyfunc.log_model`, register in UC, then call `databricks.agents.deploy(uc_model_name, version)`  
-B) Pickle the chain and write a custom Flask app that runs in Docker on the workspace  
-C) Log the chain with `mlflow.langchain.log_model` and manually create a Model Serving endpoint via the workspace UI  
-D) Use a Databricks notebook task scheduled to run the chain  
+A) The evaluation dataset no longer reflects live traffic; add the flagged traces to it (with SME-labelled expectations), fix the agent, and re-evaluate before release  
+B) Monitoring scores are unreliable because live traces have no ground truth; treat the offline 0.92 as the true quality and leave the agent unchanged  
+C) Monitoring needs a stronger signal; replace both scorers with `Correctness` on live traces so production is held to the same bar as the release gate  
+D) The 20 % sample is skewing the result; raise `sample_rate` to 1.0 so the monitoring scores converge on the offline 0.92  
 
 > [!success]- Answer
 > **Correct Answer: A**
 >
-> The Mosaic AI Agent Framework `ResponsesAgent` + `databricks.agents.deploy()` is the documented one-step path that gives you streaming, MLflow tracing, and Inference Tables auto-enabled — the third pillar (Inference Tables) directly enables the EVAL-1 / online-monitoring story. `databricks.agents.deploy()` provisions the Model Serving endpoint, registers the version, and wires all three features in one call. B is the "build it yourself" path that loses the framework benefits. C works but is two-step (no streaming or auto-tracing unless wrapped). D is for batch processing, not serving.
+> Evaluation scores a fixed, curated dataset before release; monitoring scores a sample of live traces after release. The offline score stays at 0.92 because the dataset never contained questions about the new product line, so the drop is real and only monitoring can see it. The two phases form a loop: problem traces become new evaluation rows, and the same scorers run in both phases so the numbers stay comparable. B is wrong because `RelevanceToQuery` and `RetrievalGroundedness` need no ground truth, so their production scores are valid. C fails because `Correctness` needs expectations that live traces lack, and D only changes coverage and cost: scoring more traffic would not make the new questions pass.
 
 ---
 
----
+### Question BATCH-1 *(Medium — Assembling and Deploying Applications)*
 
-### Question GW-1 *(Medium — Assembling and Deploying Apps)*
+**Scenario**: A nightly Lakeflow Job runs one SQL statement that applies `ai_query()` with a custom triage prompt to about 3 million new insurance claims and writes the results to a Delta table. Last night the query failed after several hours: one claim's text exceeded the model's context window, the endpoint returned an error for that row, and no results were written. The team wants the job to finish even when individual rows fail, and to find the failed rows easily so they can be fixed and re-run.
 
-**Scenario**: A team wants to deploy v3 of a RAG app while keeping v2 live for fallback. They need 10 % of traffic going to v3 and 90 % to v2, with the ability to ramp v3 to 100 % gradually based on quality metrics from Inference Tables.
+**Question**: What should the team change?
 
-**Question**: Which feature of a Mosaic AI Model Serving endpoint implements this canary pattern?
-
-A) Rate limits on the Unity AI Gateway — set a limit on v2 so traffic naturally spills to v3  
-B) **Multi-model endpoint traffic config** — register both `v2` and `v3` as `served_entities` on the same endpoint and set `traffic_config = {"routes": [{"served_model_name": "v3", "traffic_percentage": 10}, {"served_model_name": "v2", "traffic_percentage": 90}]}`  
-C) Unity AI Gateway guardrails — block v2 requests when v3 is healthy  
-D) Inference Tables payload logging — log every request and let the consumer choose the version  
+A) Split the claims into 1,000-row slices and call `ai_query()` once per slice from a Python loop with try/except, so a failure loses only one slice  
+B) Point `ai_query()` at a dedicated provisioned throughput endpoint, so the job has reserved capacity and stops failing  
+C) Replace the SQL statement with calls to a real-time agent endpoint, one per claim, retrying each failed call before moving on  
+D) Add `failOnError => false`, store the returned `response` and `errorMessage` fields, and re-process rows where `errorMessage` is not null  
 
 > [!success]- Answer
-> **Correct Answer: B**
+> **Correct Answer: D**
 >
-> **Traffic splitting is a Mosaic AI Model Serving feature**, not a Unity AI Gateway policy. You register multiple `served_entities` on a single endpoint and assign weighted `routes` via `traffic_config`. Weights must sum to 100; update the percentages over time to ramp. Unity AI Gateway wraps the endpoint for governance (rate limits, payload logging, guardrails, usage tracking, fallbacks) — it observes the split but doesn't define it. A misuses rate limits. C misuses guardrails. D is unrelated.
+> This is a batch workload (millions of rows, scheduled, nobody waiting), so `ai_query()` over the table is still the right tool; what is missing is per-row error handling. With `failOnError => false`, `ai_query()` returns a STRUCT with `response` and `errorMessage` for each row, so an endpoint error on one row no longer fails the whole query, and the failed rows are easy to select, fix, and re-run. Manual slicing (A) goes against the guidance to submit the full dataset in a single query, because AI Functions already manage parallelization, retries, and scaling. Provisioned throughput (B) adds capacity, but capacity does nothing about an input that exceeds the context window, so the same row fails again. A real-time endpoint (C) turns one batch query into millions of individual calls that no user is waiting for.
 
 ---
 
----
+### Question PROMPT-1 *(Medium — Assembling and Deploying Applications)*
 
-### Question EVAL-1 *(Medium — Evaluation and Monitoring)*
+**Scenario**: A support agent on Model Serving loads its system prompt on each request with `mlflow.genai.load_prompt("prompts:/main.prompts.support@production")`. On Monday the team promoted version 7 by moving the `production` alias to it. On Tuesday, monitoring shows a spike in `Guidelines` failures traced to the new wording. The on-call engineer must restore the version 6 behaviour at once, without changing code or redeploying the agent, and the team wants to keep version 7 for debugging.
 
-**Scenario**: A team wants to measure quality drift in a production RAG app. They have 30 days of Inference Table data (one row per request, with the full prompt and response). They want a *weekly* groundedness score across a sample of production traffic, scored by a stronger LLM.
+**Question**: Which action meets all three requirements?
 
-**Question**: Which approach matches the documented Databricks Agent Evaluation pattern?
-
-A) Sample N recent rows from the Inference Table into a Spark DataFrame; run `mlflow.evaluate(data=sample, model_type="databricks-agent")` so the built-in Databricks RAG judges (groundedness, relevance, correctness, safety) score the sample; schedule via a Lakeflow Job  
-B) Manually read 100 random conversations every week  
-C) Compute a groundedness score with a regex over the response text  
-D) Train a custom classifier on production data  
+A) Open version 7 in the Prompt Registry and edit its template back to the version 6 wording, with a commit message explaining the change  
+B) Call `mlflow.genai.delete_prompt()` on version 7, so the agent falls back to the most recent remaining version of the prompt  
+C) Call `mlflow.genai.set_prompt_alias()` to point `production` at version 6, leaving both versions in the registry  
+D) Call `mlflow.genai.delete_prompt_alias()` on `production`, so the agent stops using version 7 until a fix is ready  
 
 > [!success]- Answer
-> **Correct Answer: A**
+> **Correct Answer: C**
 >
-> Databricks' Agent Evaluation framework plugs into `mlflow.evaluate(...)` via `model_type="databricks-agent"`. The built-in RAG judges include **groundedness** (does the answer follow from retrieved context?), **answer relevance**, **answer correctness**, and **safety**. Each `mlflow.evaluate` call creates an MLflow run, giving a tracked time-series of quality across weeks. Schedule via a Lakeflow Job. B doesn't scale. C is brittle. D is months of work and overkill.
+> Prompt versions are immutable snapshots and aliases are mutable pointers, so a rollback is an alias move: `set_prompt_alias(name="main.prompts.support", alias="production", version=6)`. The agent resolves `@production` when it loads the prompt, so it picks up version 6 with no code change or redeploy, and version 7 stays in the history for debugging. A is not possible: a version cannot be edited, and `register_prompt()` with new text creates a new version instead. B destroys the version the team wants to keep, and the agent follows the alias, not the latest version. D removes the pointer the agent loads, so the `@production` lookup has nothing to resolve; `delete_prompt_alias()` keeps the versions but does not roll anything back.
 
 ---
 

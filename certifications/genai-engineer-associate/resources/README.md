@@ -20,6 +20,7 @@ Preparation materials for the Databricks Certified Generative AI Engineer Associ
 | [Exam Tips](./exam-tips.md) | Strategies, time management, common pitfalls |
 | [Final Review](./final-review.md) | 20-minute exam-morning cram scan |
 | [Official Links](./official-links.md) | Databricks documentation and registration |
+| [Exam-Guide Coverage Matrix](./exam-guide-coverage-matrix.md) | Which questions test each of the 56 exam-guide bullets; turns a diagnostic's wrong answers into a study list |
 
 ---
 

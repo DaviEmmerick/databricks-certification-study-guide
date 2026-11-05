@@ -71,11 +71,11 @@ Heuristic mapping of every question in this mock to its primary domain + the top
 | 43 | Medium | Design Applications | [topic folder](../../03-design-applications/README.md) | [cheat sheet](../../../../shared/fundamentals/rag-vector-search-basics.md) |
 | 44 | Hard | Governance | [topic folder](../../06-governance/README.md) | [cheat sheet](../../../../shared/cheat-sheets/unity-catalog-quick-ref.md) |
 | 45 | Hard | Design Applications | [topic folder](../../03-design-applications/README.md) | [cheat sheet](../../../../shared/fundamentals/rag-vector-search-basics.md) |
-| GOV-1 | Medium | Governance | [topic folder](../../06-governance/README.md) | [cheat sheet](../../../../shared/cheat-sheets/unity-catalog-quick-ref.md) |
-| GOV-2 | Medium | Governance | [topic folder](../../06-governance/README.md) | [cheat sheet](../../../../shared/cheat-sheets/unity-catalog-quick-ref.md) |
-| AGENT-1 | Medium | Governance | [topic folder](../../06-governance/README.md) | [cheat sheet](../../../../shared/cheat-sheets/unity-catalog-quick-ref.md) |
-| GW-1 | Medium | Governance | [topic folder](../../06-governance/README.md) | [cheat sheet](../../../../shared/cheat-sheets/unity-catalog-quick-ref.md) |
-| EVAL-1 | Medium | Governance | [topic folder](../../06-governance/README.md) | [cheat sheet](../../../../shared/cheat-sheets/unity-catalog-quick-ref.md) |
+| DATA-1 | Hard | Data Preparation | [topic folder](../../04-data-preparation/README.md) | [cheat sheet](../../../../shared/fundamentals/rag-vector-search-basics.md) |
+| APPDEV-1 | Medium | Application Development | [topic folder](../../01-application-development/README.md) | [cheat sheet](../../../../shared/cheat-sheets/mlflow-quick-ref.md) |
+| APPDEV-2 | Hard | Application Development | [topic folder](../../01-application-development/README.md) | [cheat sheet](../../../../shared/cheat-sheets/mlflow-quick-ref.md) |
+| BATCH-1 | Medium | Assembling and Deploying Applications | [topic folder](../../02-assembling-and-deploying-apps/README.md) | [cheat sheet](../../../../shared/cheat-sheets/mlflow-quick-ref.md) |
+| PROMPT-1 | Medium | Assembling and Deploying Applications | [topic folder](../../02-assembling-and-deploying-apps/README.md) | [cheat sheet](../../../../shared/cheat-sheets/mlflow-quick-ref.md) |
 
 ## Per-section question map
 
@@ -89,10 +89,9 @@ The GenAI mock-exam questions.md is a flat block (one question per scenario). Ma
 | Chunking / embeddings / Vector Search index creation | Data Preparation (14 %) |
 | MLflow evaluation / LLM-as-judge / Inference Tables / drift | Evaluation and Monitoring (12 %) |
 | UC for AI assets / PII handling / content safety / AI Gateway policies | Governance (8 %) |
-| Refresh: GOV-1, GOV-2 | Governance (8 %) |
-| Refresh: AGENT-1 | Assembling and Deploying Applications (22 %) |
-| Refresh: GW-1 | Assembling and Deploying Applications (22 %) — Model Serving traffic config |
-| Refresh: EVAL-1 | Evaluation and Monitoring (12 %) |
+| Supplementary: DATA-1 | Data Preparation (14 %) |
+| Supplementary: APPDEV-1, APPDEV-2 | Application Development (30 %) |
+| Supplementary: BATCH-1, PROMPT-1 | Assembling and Deploying Applications (22 %) |
 
 ## Study plan by miss count (45-question mock)
 
